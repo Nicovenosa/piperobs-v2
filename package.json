@@ -1,0 +1,36 @@
+{
+  "name": "piperobs-v2",
+  "version": "2.1.0",
+  "description": "Local TTS for Obsidian using Piper — Karaoke highlight, Pomodoro, 5 themes, offline voices",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc --noEmit -p tsconfig.json && node esbuild.config.mjs production"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "tts",
+    "piper",
+    "text-to-speech",
+    "karaoke",
+    "pomodoro"
+  ],
+  "author": "Nicolas Venosa",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NicolasVenosa/piperobs-v2"
+  },
+  "bugs": {
+    "url": "https://github.com/NicolasVenosa/piperobs-v2/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.21.0",
+    "obsidian": "^1.12.3",
+    "tslib": "^2.6.0",
+    "typescript": "^5.0.0"
+  }
+}

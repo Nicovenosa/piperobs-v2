@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Versión monocroma - usa currentColor -->
+  <path d="M4 4 Q4 2 6 2 L26 2 Q28 2 28 4 L28 20 Q28 22 26 22 L20 22 L16 28 L12 22 L6 22 Q4 22 4 20 Z" fill="currentColor"/>
+  <rect x="8"  y="11" width="3" height="8"  rx="1.5" fill="white" opacity="0.9"/>
+  <rect x="13" y="8"  width="3" height="11" rx="1.5" fill="white"/>
+  <rect x="18" y="11" width="3" height="8"  rx="1.5" fill="white" opacity="0.6"/>
+  <rect x="23" y="13" width="2" height="6"  rx="1"   fill="white" opacity="0.35"/>
+</svg>

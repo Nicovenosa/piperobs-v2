@@ -1,0 +1,10 @@
+{
+  "id": "piperobs-v2",
+  "name": "PiperObs v2",
+  "version": "2.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Local TTS for Obsidian. Karaoke highlight, Pomodoro, 5 themes, offline.",
+  "author": "Nicolas Venosa",
+  "authorUrl": "https://github.com/NicolasVenosa",
+  "isDesktopOnly": true
+}

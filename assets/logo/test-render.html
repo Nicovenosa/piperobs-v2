@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PiperObs · Logo Render Test</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0F141B;
+  color: #E4E6EB;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 40px;
+  line-height: 1.6;
+}
+
+main { max-width: 1200px; margin: 0 auto; }
+
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #FFF;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 32px;
+}
+
+h2 {
+  font-size: 14px;
+  color: #888;
+  font-weight: 500;
+  margin: 48px 0 24px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.section {
+  background: #1A1F29;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 24px;
+  align-items: center;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.light-bg {
+  background: #F5F5F5;
+}
+
+.light-bg .item {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.light-bg .label {
+  color: #999;
+}
+
+.mono-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.mono-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mono-item-label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.color-violet { color: #7C3AED; }
+.color-cyan { color: #22D3EE; }
+.color-pink { color: #EC4899; }
+.color-white { color: #FFF; }
+.color-gray { color: #999; }
+
+.status-bar {
+  background: #1A1F29;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 24px;
+}
+
+.status-bar img,
+.status-bar svg {
+  display: block;
+}
+
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.comparison-item h3 {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.comparison-item p {
+  font-size: 11px;
+  color: #777;
+  line-height: 1.5;
+}
+
+.code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #22D3EE;
+  margin-top: 8px;
+  word-break: break-all;
+}
+
+@media (max-width: 768px) {
+  .grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+  .comparison { grid-template-columns: 1fr; }
+  body { padding: 24px; }
+}
+</style>
+</head>
+<body>
+
+<main>
+
+<h1>🎨 PiperObs · Logo Render Test</h1>
+<p class="subtitle">Versiones procesadas | Adobe → Color → Monocroma</p>
+
+<section class="section">
+  <h2>📊 Versión COLOR — Fondo Oscuro</h2>
+  <div class="grid">
+    <div class="item">
+      <img src="piperobs-mark-color.svg" width="16" height="16" alt="Logo 16px">
+      <span class="label">16px</span>
+    </div>
+    <div class="item">
+      <img src="piperobs-mark-color.svg" width="22" height="22" alt="Logo 22px">
+      <span class="label">22px (status bar)</span>
+    </div>
+    <div class="item">
+      <img src="piperobs-mark-color.svg" width="32" height="32" alt="Logo 32px">
+      <span class="label">32px</span>
+    </div>
+    <div class="item">
+      <img src="piperobs-mark-color.svg" width="48" height="48" alt="Logo 48px">
+      <span class="label">48px</span>
+    </div>
+    <div class="item">
+      <img src="piperobs-mark-color.svg" width="64" height="64" alt="Logo 64px">
+      <span class="label">64px</span>
+    </div>
+    <div class="item">
+      <img src="piperobs-mark-color.svg" width="128" height="128" alt="Logo 128px">
+      <span class="label">128px</span>
+    </div>
+    <div class="item">
+      <img src="piperobs-mark-color.svg" width="256" height="256" alt="Logo 256px">
+      <span class="label">256px</span>
+    </div>
+  </div>
+</section>
+
+<section class="section light-bg">
+  <h2>☀️ Versión COLOR — Fondo Claro</h2>
+  <div class="grid">
+    <div class="item">
+      <img src="piperobs-mark-color.svg" width="16" height="16" alt="Logo 16px claro">
+      <span class="label">16px</span>
+    </div>
+    <div class="item">
+      <img src="piperobs-mark-color.svg" width="32" height="32" alt="Logo 32px claro">
+      <span class="label">32px</span>
+    </div>
+    <div class="item">
+      <img src="piperobs-mark-color.svg" width="64" height="64" alt="Logo 64px claro">
+      <span class="label">64px</span>
+    </div>
+    <div class="item">
+      <img src="piperobs-mark-color.svg" width="128" height="128" alt="Logo 128px claro">
+      <span class="label">128px</span>
+    </div>
+  </div>
+</section>
+
+<h2>⚪ Versión MONOCROMA — currentColor (adaptable a tema)</h2>
+
+<section class="section">
+  <div class="mono-section">
+    <div class="mono-item color-violet">
+      <svg width="48" height="48" id="mono-1"></svg>
+      <span class="mono-item-label">Violeta</span>
+    </div>
+    <div class="mono-item color-cyan">
+      <svg width="48" height="48" id="mono-2"></svg>
+      <span class="mono-item-label">Cian</span>
+    </div>
+    <div class="mono-item color-pink">
+      <svg width="48" height="48" id="mono-3"></svg>
+      <span class="mono-item-label">Rosa</span>
+    </div>
+    <div class="mono-item color-white">
+      <svg width="48" height="48" id="mono-4"></svg>
+      <span class="mono-item-label">Blanco</span>
+    </div>
+    <div class="mono-item color-gray">
+      <svg width="48" height="48" id="mono-5"></svg>
+      <span class="mono-item-label">Gris</span>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>🎯 Test Crítico: Status Bar (22px)</h2>
+  <p style="font-size: 13px; color: #999; margin-bottom: 16px;">
+    Este es el tamaño real en que aparecería el logo en barras de estado / iconos pequeños. Si acá se reconoce bien, está listo para producción.
+  </p>
+  <div class="status-bar">
+    <img src="piperobs-mark-color.svg" width="22" height="22" alt="PiperObs logo">
+    <span>PiperObs · status ready</span>
+  </div>
+</section>
+
+<section class="section">
+  <h2>📈 Comparación: Tamaños de archivo</h2>
+  <div class="comparison">
+    <div class="comparison-item">
+      <h3>Original Adobe</h3>
+      <p>✗ Con fondo gris embebido (#1E2326)</p>
+      <div class="code">48.1 KB | 41 paths</div>
+    </div>
+    <div class="comparison-item">
+      <h3>Optimizado (Color)</h3>
+      <p>✓ Fondo removido + SVGO 55% compresión</p>
+      <div class="code">12.3 KB | Listo para producción</div>
+    </div>
+    <div class="comparison-item">
+      <h3>Monocroma</h3>
+      <p>✓ Colores → currentColor (tema adaptable)</p>
+      <div class="code">12.7 KB | 25 fills dinámicos</div>
+    </div>
+    <div class="comparison-item">
+      <h3>Ahorro total</h3>
+      <p>✓ De 48KB a 12KB (74.5% más pequeño)</p>
+      <div class="code">Ideal para web / icono en barra</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>📝 Archivos generados</h2>
+  <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.8;">
+    <div>✓ piperobs-mark-color.svg — versión a color optimizada</div>
+    <div>✓ piperobs-mark-mono.svg — versión monocroma con currentColor</div>
+    <div>✓ originals/piperobs-mark-adobe-original.svg — archivo original sin procesar</div>
+    <div>✓ discarded/ — versiones anteriores descartadas</div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>🎯 Sistema de logo completo</h2>
+  <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+    <div class="item">
+      <span style="font-size:11px;color:#666">Mark pequeño (UI)</span>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:8px">
+        <img src="piperobs-mark-small.svg" width="16" height="16">
+        <img src="piperobs-mark-small.svg" width="22" height="22">
+        <img src="piperobs-mark-small.svg" width="32" height="32">
+        <img src="piperobs-mark-small.svg" width="64" height="64">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>✨ Status bar final</h2>
+  <div class="status-bar">
+    <img src="piperobs-mark-small.svg" width="16" height="16">
+    <span>PiperObs · listo</span>
+  </div>
+</section>
+
+</main>
+
+<script>
+// Cargar SVG monocroma en contenedores dinámicos
+fetch('piperobs-mark-mono.svg')
+  .then(r => r.text())
+  .then(svgText => {
+    const containers = document.querySelectorAll('[id^="mono-"]');
+    containers.forEach((el) => {
+      const wrapper = el.parentElement;
+      const color = getComputedStyle(wrapper).color;
+      const newSvg = svgText.replace(
+        '<svg',
+        `<svg width="48" height="48" style="color: ${color}"`
+      );
+      el.outerHTML = newSvg;
+    });
+  })
+  .catch(e => console.error('Error cargando SVG monocroma:', e));
+</script>
+
+</body>
+</html>

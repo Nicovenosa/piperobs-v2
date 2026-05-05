@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs (keep main.js and styles.css for release)
+# main.js
+# styles.css
+
+# Data directories
+.obsidian/piperobs-data/
+*.wav
+.temp-*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Optional: Uncomment if you don't want to commit source
+# src/
+# esbuild.config.mjs
+# tsconfig.json
