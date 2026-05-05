@@ -3,8 +3,8 @@
 > Local TTS (Text-to-Speech) for Obsidian using Piper. Karaoke highlight, Pomodoro timer, 5 color themes, offline voice synthesis.
 
 [![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?color=7e6ad4&label=downloads&query=%24%5B%22piperobs-v2%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json&logo=obsidian&style=flat-square)](https://obsidian.md/plugins?id=piperobs-v2)
-[![Version](https://img.shields.io/github/v/release/NicolasVenosa/piperobs-v2?style=flat-square)](https://github.com/NicolasVenosa/piperobs-v2/releases)
-[![License](https://img.shields.io/github/license/NicolasVenosa/piperobs-v2?style=flat-square)](LICENSE)
+[![Version](https://img.shields.io/github/v/release/Nicovenosa/piperobs-v2?style=flat-square)](https://github.com/Nicovenosa/piperobs-v2/releases)
+[![License](https://img.shields.io/github/license/Nicovenosa/piperobs-v2?style=flat-square)](LICENSE)
 
 ---
 
@@ -26,21 +26,16 @@
 ## 📸 Screenshots
 
 ### Sidebar — Controles principales
-<!-- IMAGEN 1: Guardar como /home/zeroox/piperobs-screenshots/01-sidebar.png -->
 ![Sidebar Preview](assets/screenshots/01-sidebar.png)
 *Panel lateral con velocidad, volumen, selector de voz, temas, focus mode y pomodoro*
 
 ### MiniPlayer — Reproducción flotante
-<!-- IMAGEN 2: Guardar como /home/zeroox/piperobs-screenshots/02-miniplayer.png -->
 ![MiniPlayer Preview](assets/screenshots/02-miniplayer.png)
 *Barra flotante con waveform animado, controles de reproducción y progreso*
 
 ### Karaoke — Resaltado de palabras
-<!-- IMAGEN 3: Guardar como /home/zeroox/piperobs-screenshots/03-karaoke.png -->
 ![Karaoke Preview](assets/screenshots/03-karaoke.png)
 *Modo edición: palabras resaltadas en tiempo real mientras se lee*
-
-> **Nota:** Las imágenes se agregarán antes del release.
 
 ---
 
@@ -133,7 +128,7 @@ And 30+ more languages available via the Piper voice repository.
 ## 🛠️ Development
 
 ```bash
-git clone https://github.com/NicolasVenosa/piperobs-v2.git
+git clone https://github.com/Nicovenosa/piperobs-v2.git
 cd piperobs-v2
 npm install
 npm run build
@@ -172,12 +167,12 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 - [Piper TTS](https://github.com/rhasspy/piper) by Rhasspy / Michael Hansen
 - [Obsidian](https://obsidian.md) by Dynalist
-- Built with ❤️ by [Nicolas Venosa](https://github.com/NicolasVenosa)
+- Built with ❤️ by [Nicolas Venosa](https://github.com/Nicovenosa)
 
 ---
 
 <div align="center">
 
-**[⭐ Star this repo](https://github.com/NicolasVenosa/piperobs-v2)** if you find it useful!
+**[⭐ Star this repo](https://github.com/Nicovenosa/piperobs-v2)** if you find it useful!
 
 </div>
