@@ -382,8 +382,8 @@ export class KaraokeHighlighter {
     const container = view.containerEl.querySelector('.markdown-preview-view, .markdown-reading-view') as HTMLElement;
     if (!container) return;
 
-    // Buscar párrafos por índice o por texto
-    const paragraphs = Array.from(container.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, blockquote'));
+    // Solo buscar elementos de contenido textual (sin headers, para que coincida con el extractor)
+    const paragraphs = Array.from(container.querySelectorAll('p, li, blockquote'));
     const targetParagraph = paragraphs[match.paragraph.paragraphIndex] as HTMLElement;
     if (!targetParagraph) {
       // Fallback: buscar por contenido de texto

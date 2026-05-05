@@ -11,12 +11,12 @@
 ## ✨ Features
 
 - 🎙️ **Local TTS** — Synthesize speech offline using [Piper TTS](https://github.com/rhasspy/piper). No internet required after setup.
-- 🎨 **Karaoke Highlight** — Words are highlighted in real-time as they are spoken (editor mode).
+- 🎨 **Karaoke Highlight** — Words are highlighted in real-time as they are spoken (editor mode only).
 - 🍅 **Adaptive Pomodoro** — Auto-adjusts focus/break sessions based on document length.
 - 🎭 **5 Color Themes** — Gold, Cyan, Magenta, Green, Orange. Switch anytime.
 - 🎤 **Voice Manager** — Download, delete, and switch voices on the fly.
 - 🎚️ **Volume & Speed** — Independent controls for playback volume (0-100%) and speed (0.75x - 1.5x).
-- 🎯 **Focus Mode** — Dims everything except the active line while reading.
+- 🎯 **Focus Mode** — Dims everything except the active line while reading (editor mode only).
 - 🌐 **Multi-language** — Supports Spanish (AR, ES, MX), Portuguese, English, and more.
 - 📱 **MiniPlayer** — Floating playback bar with waveform animation and progress.
 - ⚡ **Gapless Playback** — Web Audio API for smooth, uninterrupted reading.
