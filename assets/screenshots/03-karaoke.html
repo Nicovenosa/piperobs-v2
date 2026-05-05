@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>PiperObs Karaoke</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #0b0d12;
+    display:flex; justify-content:center; align-items:center;
+    min-height:100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 40px;
+  }
+  .editor-frame {
+    width: 900px; height: 520px;
+    background: #141821;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 30px 100px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
+    overflow: hidden; position: relative;
+    display: flex; flex-direction: column;
+  }
+
+  /* Title bar */
+  .titlebar {
+    height: 44px; background: #0f1117;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; padding: 0 18px; gap: 10px;
+  }
+  .tb-icon { width: 16px; height: 16px; border-radius: 3px; background: rgba(255,255,255,0.1); }
+  .tb-title { font-size: 13px; color: #94a3b8; font-weight: 600; }
+
+  .editor-body {
+    flex: 1; display: flex; overflow: hidden;
+  }
+
+  /* Left sidebar */
+  .left-sidebar {
+    width: 44px; background: #0f1117;
+    border-right: 1px solid rgba(255,255,255,0.05);
+    display: flex; flex-direction: column; align-items: center; padding-top: 12px; gap: 8px;
+  }
+  .ls-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: rgba(255,255,255,0.06); display: grid; place-items: center;
+  }
+
+  /* Content */
+  .content {
+    flex: 1; padding: 30px 50px;
+    font-size: 16px; line-height: 1.8; color: #cbd5e1;
+    overflow-y: auto;
+  }
+  .content h1 {
+    font-size: 32px; font-weight: 800; color: #fbbf24;
+    margin-bottom: 20px; letter-spacing: -0.5px;
+  }
+  .content h2 {
+    font-size: 22px; font-weight: 700; color: #93c5fd;
+    margin-top: 24px; margin-bottom: 12px;
+  }
+  .content p { margin-bottom: 8px; }
+
+  /* Karaoke highlight */
+  .word {
+    position: relative; display: inline-block;
+    padding: 1px 3px; margin: 0 -2px; border-radius: 4px;
+    transition: all 0.15s ease;
+  }
+  .word.hl {
+    background: rgba(251,191,36,0.15);
+    color: #fbbf24; font-weight: 700;
+    box-shadow: 0 0 20px rgba(251,191,36,0.15), inset 0 0 0 1px rgba(251,191,36,0.3);
+  }
+
+  /* Cursor */
+  .cursor {
+    display: inline-block; width: 2px; height: 22px;
+    background: #fbbf24; vertical-align: middle; margin-left: 2px;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* Status pill */
+  .status-pill {
+    position: absolute; bottom: 16px; right: 16px;
+    background: #0f1117; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 24px; padding: 8px 16px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: #fbbf24;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .sp-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #fbbf24;
+    box-shadow: 0 0 8px rgba(251,191,36,0.5);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  /* Animation for demo */
+  @keyframes highlightWord {
+    0%, 100% { background: transparent; color: #cbd5e1; font-weight: 400; box-shadow: none; }
+    50% { background: rgba(251,191,36,0.15); color: #fbbf24; font-weight: 700; box-shadow: 0 0 20px rgba(251,191,36,0.15), inset 0 0 0 1px rgba(251,191,36,0.3); }
+  }
+
+  .word.demo1 { animation: highlightWord 2s ease-in-out 0s infinite; }
+  .word.demo2 { animation: highlightWord 2s ease-in-out 0.5s infinite; }
+  .word.demo3 { animation: highlightWord 2s ease-in-out 1s infinite; }
+  .word.demo4 { animation: highlightWord 2s ease-in-out 1.5s infinite; }
+</style>
+</head>
+<body>
+<div class="editor-frame">
+  <div class="titlebar">
+    <div class="tb-icon"></div>
+    <div class="tb-title">Sistemas Operativos - Unidad 2.md</div>
+  </div>
+  <div class="editor-body">
+    <div class="left-sidebar">
+      <div class="ls-icon"></div>
+      <div class="ls-icon"></div>
+      <div class="ls-icon"></div>
+      <div class="ls-icon"></div>
+    </div>
+    <div class="content">
+      <h1>Procesos y Threads</h1>
+      <p>Un <span class="word demo1">proceso</span> es un programa en ejecución. Cada <span class="word demo2">proceso</span> tiene su propio espacio de memoria, registros y estado.</p>
+      <p>Un <span class="word demo3">thread</span> (hilo) es la unidad mínima de ejecución dentro de un proceso. Varios <span class="word demo4">threads</span> pueden compartir el mismo espacio de memoria.</p>
+      <h2>Diferencias clave</h2>
+      <p>| Proceso | Thread |</p>
+      <p>| Memoria separada | Memoria compartida |</p>
+      <p>| Más pesado | Más liviano |</p>
+      <p><span class="cursor"></span></p>
+    </div>
+  </div>
+  <div class="status-pill">
+    <div class="sp-dot"></div>
+    Reproduciendo...
+  </div>
+</div>
+</body>
+</html>

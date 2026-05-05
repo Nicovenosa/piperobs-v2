@@ -1,6 +1,6 @@
 # 🔊 PiperObs v2
 
-> Local TTS (Text-to-Speech) for Obsidian using Piper. Karaoke highlight, Pomodoro timer, 5 color themes, offline voice synthesis.
+> Local TTS with karaoke highlight, Pomodoro timer, 5 color themes, and offline voice synthesis.
 
 [![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?color=7e6ad4&label=downloads&query=%24%5B%22piperobs-v2%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json&logo=obsidian&style=flat-square)](https://obsidian.md/plugins?id=piperobs-v2)
 [![Version](https://img.shields.io/github/v/release/Nicovenosa/piperobs-v2?style=flat-square)](https://github.com/Nicovenosa/piperobs-v2/releases)
