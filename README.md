@@ -25,23 +25,22 @@
 
 ## 📸 Screenshots
 
-<!-- PASO 1: Sacar capturas en Obsidian -->
-<!-- PASO 2: Guardarlas en /home/zeroox/piperobs-screenshots/ -->
-<!-- PASO 3: Yo (Claude) las subo al repo y actualizo estas URLs -->
-
 ### Sidebar — Controles principales
-![Sidebar Preview](https://raw.githubusercontent.com/NicolasVenosa/piperobs-v2/main/assets/screenshots/sidebar.png)
+<!-- IMAGEN 1: Guardar como /home/zeroox/piperobs-screenshots/01-sidebar.png -->
+![Sidebar Preview](assets/screenshots/01-sidebar.png)
 *Panel lateral con velocidad, volumen, selector de voz, temas, focus mode y pomodoro*
 
 ### MiniPlayer — Reproducción flotante
-![MiniPlayer Preview](https://raw.githubusercontent.com/NicolasVenosa/piperobs-v2/main/assets/screenshots/miniplayer.png)
+<!-- IMAGEN 2: Guardar como /home/zeroox/piperobs-screenshots/02-miniplayer.png -->
+![MiniPlayer Preview](assets/screenshots/02-miniplayer.png)
 *Barra flotante con waveform animado, controles de reproducción y progreso*
 
 ### Karaoke — Resaltado de palabras
-![Karaoke Preview](https://raw.githubusercontent.com/NicolasVenosa/piperobs-v2/main/assets/screenshots/karaoke.png)
+<!-- IMAGEN 3: Guardar como /home/zeroox/piperobs-screenshots/03-karaoke.png -->
+![Karaoke Preview](assets/screenshots/03-karaoke.png)
 *Modo edición: palabras resaltadas en tiempo real mientras se lee*
 
-> **Nota:** Las imágenes se agregarán antes del release. Si estás viendo esto en GitHub y faltan imágenes, estamos en proceso de subirlas.
+> **Nota:** Las imágenes se agregarán antes del release.
 
 ---
 
