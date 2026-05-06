@@ -196,7 +196,7 @@ export class PiperEngine {
         if (code === 0) resolve();
         else reject(new Error(`Piper exit code ${code}`));
       });
-      child.on('error', (err) => reject(err));
+      child.on('error', (err) => reject(err instanceof Error ? err : new Error(String(err))));
       setTimeout(() => reject(new Error('Piper binary timeout')), 5000);
     });
   }
@@ -344,9 +344,10 @@ export class PiperEngine {
       // Si buffer vacío, esperar síntesis en curso o iniciar una
       let item = buffer.shift();
       if (!item) {
-        if (nextPromise) {
+        const np = nextPromise;
+        if (np) {
           try {
-            const r: PhraseAudioItem = await nextPromise;
+            const r: PhraseAudioItem = await np;
             if (this.checkGen(gen) && !this.currentJob?.abort) item = r;
             else { this.safeUnlink(r.file); }
           } catch { /* no-op */ }
@@ -388,7 +389,8 @@ export class PiperEngine {
 
       if (!this.checkGen(gen)) {
         this.safeUnlink(item.file);
-        if (nextPromise) { try { await nextPromise; } catch { /* no-op */ } }
+        const np2 = nextPromise;
+        if (np2) { try { await np2; } catch { /* no-op */ } }
         return;
       }
 
@@ -396,9 +398,10 @@ export class PiperEngine {
       this.emit('phrase-finished', { paragraphIndex: phrase.paragraphIndex, phraseIndex: phrase.phraseIndex });
 
       // Consumir nextPromise si terminó mientras reproducíamos
-      if (nextPromise) {
+      const np3 = nextPromise;
+      if (np3) {
         try {
-          const r = await nextPromise;
+          const r = await np3;
           if (this.checkGen(gen) && !this.currentJob?.abort) buffer.push(r);
           else { this.safeUnlink(r.file); }
         } catch { /* no-op */ }
@@ -516,7 +519,6 @@ export class PiperEngine {
         return;
       }
 
-      const sampleRate = readWavSampleRate(tempFile);
       const duration = this.estimateDurationFromFile(tempFile, phrase.words.length);
       const wordTimings = this.estimateWordTimings(phrase.words, duration);
       const seekAudioBuffer = await this.decodeWav(tempFile);
@@ -588,9 +590,10 @@ export class PiperEngine {
       const phrase = phrases[i];
       let item = buffer.shift();
       if (!item) {
-        if (nextPromise) {
+        const np = nextPromise;
+        if (np) {
           try {
-            const r: PhraseAudioItem = await nextPromise;
+            const r: PhraseAudioItem = await np;
             if (this.checkGen(gen) && !this.currentJob?.abort) item = r;
             else { this.safeUnlink(r.file); }
           } catch { /* no-op */ }
@@ -625,16 +628,18 @@ export class PiperEngine {
 
       if (!this.checkGen(gen)) {
         this.safeUnlink(item.file);
-        if (nextPromise) { try { await nextPromise; } catch { /* no-op */ } }
+        const np2 = nextPromise;
+        if (np2) { try { await np2; } catch { /* no-op */ } }
         return;
       }
 
       this.safeUnlink(item.file);
       this.emit('phrase-finished', { paragraphIndex: phrase.paragraphIndex, phraseIndex: phrase.phraseIndex });
 
-      if (nextPromise) {
+      const np3 = nextPromise;
+      if (np3) {
         try {
-          const r = await nextPromise;
+          const r = await np3;
           if (this.checkGen(gen) && !this.currentJob?.abort) buffer.push(r);
           else { this.safeUnlink(r.file); }
         } catch { /* no-op */ }
@@ -730,7 +735,7 @@ export class PiperEngine {
     if (platform() !== 'win32') {
       await new Promise<void>((resolve, reject) => {
         execFile('chmod', ['+x', this.binPath], (err) => {
-          if (err) reject(err);
+          if (err) reject(err instanceof Error ? err : new Error(String(err)));
           else resolve();
         });
       });
@@ -831,7 +836,7 @@ export class PiperEngine {
         }
       });
 
-      child.on('error', (err) => reject(err));
+      child.on('error', (err) => reject(err instanceof Error ? err : new Error(String(err))));
 
       child.stdin.write(text);
       child.stdin.end();
@@ -859,7 +864,7 @@ export class PiperEngine {
     return new Promise((resolve, reject) => {
       ctx.decodeAudioData(arrayBuffer, (decoded) => {
         resolve(this.trimAudioBuffer(decoded));
-      }, (err) => reject(err));
+      }, (err) => reject(err instanceof Error ? err : new Error(String(err))));
     });
   }
 
@@ -1071,11 +1076,11 @@ export class PiperEngine {
         file.on('finish', () => resolve());
         file.on('error', (err) => {
           try { unlinkSync(destPath); } catch { /* no-op */ }
-          reject(err);
+          reject(err instanceof Error ? err : new Error(String(err)));
         });
       });
 
-      req.on('error', (err) => reject(err));
+      req.on('error', (err) => reject(err instanceof Error ? err : new Error(String(err))));
       req.setTimeout(120000, () => {
         req.destroy();
         reject(new Error('Timeout descargando'));
@@ -1087,12 +1092,12 @@ export class PiperEngine {
     return new Promise((resolve, reject) => {
       if (archivePath.endsWith('.zip')) {
         execFile('unzip', ['-o', archivePath, '-d', destDir], (err) => {
-          if (err) reject(err);
+          if (err) reject(err instanceof Error ? err : new Error(String(err)));
           else resolve();
         });
       } else {
         execFile('tar', ['-xzf', archivePath, '-C', destDir], (err) => {
-          if (err) reject(err);
+          if (err) reject(err instanceof Error ? err : new Error(String(err)));
           else resolve();
         });
       }

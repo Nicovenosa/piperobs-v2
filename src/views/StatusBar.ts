@@ -60,7 +60,7 @@ export class StatusBarItem {
     this.container.appendChild(this.markSvg);
 
     this.text = this.container.createSpan();
-    this.text.setText('PiperObs · listo');
+    this.text.setText('Listo');
   }
 
   update(state: StatusState, extra?: { voiceShort?: string; rate?: number }) {
@@ -68,10 +68,10 @@ export class StatusBarItem {
 
     switch (state) {
       case 'idle':
-        text = 'PiperObs · listo';
+        text = 'Listo';
         break;
       case 'synthesizing':
-        text = 'PiperObs · preparando';
+        text = 'Preparando';
         break;
       case 'playing': {
         const voiceText = extra?.voiceShort || 'Leyendo';
@@ -80,13 +80,13 @@ export class StatusBarItem {
         break;
       }
       case 'paused':
-        text = 'PiperObs · pausado';
+        text = 'Pausado';
         break;
       case 'error':
-        text = '⚠ PiperObs · error';
+        text = '⚠ Error';
         break;
       case 'disconnected':
-        text = '⚠ sin bridge';
+        text = '⚠ Sin bridge';
         break;
     }
 

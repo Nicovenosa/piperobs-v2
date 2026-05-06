@@ -405,7 +405,7 @@ export class SidePanelView extends ItemView {
       if (voice.installed || voice.isDefault) {
         const badge = row.createSpan('piperobs-voice-badge');
         badge.addClass(voice.isDefault ? 'default' : 'installed');
-        badge.setText(voice.isDefault ? 'Default' : 'Instalada');
+        badge.setText(voice.isDefault ? 'Predeterminada' : 'Instalada');
       } else {
         row.createSpan('piperobs-voice-unavailable').setText('No instalada');
       }
@@ -500,7 +500,7 @@ export class SidePanelView extends ItemView {
     if (this.el.focusBtn) {
       this.el.focusBtn.classList.toggle('active', active);
       this.el.focusBtn.empty();
-      this.el.focusBtn.appendText(active ? '\u{1F3AF} Focus activo' : '\u{1F3AF} Modo focus');
+      this.el.focusBtn.appendText(active ? '\u{1F3AF} focus activo' : '\u{1F3AF} Modo focus');
     }
   }
 

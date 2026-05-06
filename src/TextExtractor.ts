@@ -58,7 +58,7 @@ interface MutableWord {
 }
 
 const SENTENCE_END_RE = /[.!?…]+(?:["')\]]+)?$/;
-const MARKDOWN_TRIM_RE = /^[#*_~|>\-+\[\]()"'`]+|[#*_~|[\]()"'`]+$/g;
+const MARKDOWN_TRIM_RE = /^[#*_~|>\-+\[\]()"'`]+|[#*_~[\]()"'`]+$/g;
 const LEADING_LIST_RE = /^(\s*(?:[-*+]\s+|\d+[.)]\s+|#{1,6}\s+|>\s+))+/;
 const URL_RE = /^https?:\/\//i;
 const TABLE_LINE_RE = /^\s*\|.*\|.*$/;

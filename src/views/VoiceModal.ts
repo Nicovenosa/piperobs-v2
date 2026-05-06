@@ -1,15 +1,6 @@
 import { Modal, App, requestUrl } from 'obsidian';
 import { InstalledVoice, FEATURED_VOICES } from '../settings/DEFAULTS';
 
-interface CatalogVoice {
-  id: string;
-  name: string;
-  flag: string;
-  language: string;
-  quality: string;
-  sizeMB: number;
-}
-
 export class VoiceModal extends Modal {
   installedVoices: InstalledVoice[] = [];
   activeTab: 'installed' | 'explore' = 'installed';
@@ -56,12 +47,12 @@ export class VoiceModal extends Modal {
         const info = row.createDiv('piperobs-voice-info');
         info.createDiv('piperobs-voice-name').setText(voice.name);
         const meta = info.createDiv('piperobs-voice-meta');
-        meta.setText(`${voice.language} · ${voice.gender === 'femenina' ? 'Femenina' : 'Masculina'} · ${voice.sizeMB} MB`);
+        meta.setText(`${voice.language} · ${voice.gender === 'femenina' ? 'femenina' : 'masculina'} · ${voice.sizeMB} MB`);
 
         const badge = row.createEl('span');
         if (voice.isDefault) {
           badge.className = 'piperobs-badge def';
-          badge.setText('Default');
+          badge.setText('Predeterminada');
         } else {
           badge.className = 'piperobs-badge inst';
           badge.setText('Instalada');
@@ -84,7 +75,7 @@ export class VoiceModal extends Modal {
         const info = row.createDiv('piperobs-voice-info');
         info.createDiv('piperobs-voice-name').setText(featured.name);
         const meta = info.createDiv('piperobs-voice-meta');
-        meta.setText(`${featured.language} · ${featured.gender === 'femenina' ? 'Femenina' : 'Masculina'} · ${featured.sizeMB} MB`);
+        meta.setText(`${featured.language} · ${featured.gender === 'femenina' ? 'femenina' : 'masculina'} · ${featured.sizeMB} MB`);
 
         const dlBtn = row.createEl('button', { cls: 'piperobs-btn-download' });
         dlBtn.setText(`⬇ ${featured.sizeMB} MB`);
@@ -116,8 +107,8 @@ export class VoiceModal extends Modal {
         { code: 'en', label: '🇺🇸 Inglés' },
         { code: 'de', label: '🇩🇪 Alemán' },
         { code: 'fr', label: '🇫🇷 Francés' },
-        { code: 'masculina', label: 'Masculina' },
-        { code: 'femenina', label: 'Femenina' },
+        { code: 'masculina', label: 'masculina' },
+        { code: 'femenina', label: 'femenina' },
       ];
       const activeFilters: Set<string> = new Set();
 
@@ -162,7 +153,7 @@ export class VoiceModal extends Modal {
         const info = row.createDiv('piperobs-voice-info');
         info.createDiv('piperobs-voice-name').setText(f.name);
         const meta = info.createDiv('piperobs-voice-meta');
-        meta.setText(`${f.language} · ${f.gender === 'femenina' ? 'Femenina' : 'Masculina'} · ${f.sizeMB} MB`);
+        meta.setText(`${f.language} · ${f.gender === 'femenina' ? 'femenina' : 'masculina'} · ${f.sizeMB} MB`);
 
         if (installed) {
           row.createEl('span', { cls: 'piperobs-badge inst', text: 'Instalada' });
@@ -196,7 +187,6 @@ export class VoiceModal extends Modal {
               const voiceId = parts[parts.length - 1].replace('.onnx', '');
               const qual = parts[parts.length - 2] || 'medium';
               const name = parts[parts.length - 3] || voiceId;
-              const region = parts[parts.length - 4] || '';
               const lang = parts[parts.length - 5] || parts[0] || '';
 
               let flag = '';
@@ -254,7 +244,7 @@ export class VoiceModal extends Modal {
             const moreBtn = body.createEl('button', { cls: 'piperobs-catalog-more' });
             moreBtn.setText('Cargar más voces →');
             moreBtn.onclick = () => {
-              void loadCatalog();
+              loadCatalog().catch((err: Error) => console.error(err));
             };
           }
         } catch {
@@ -263,7 +253,7 @@ export class VoiceModal extends Modal {
         }
       };
 
-      void loadCatalog();
+      loadCatalog().catch((err: Error) => console.error(err));
     };
 
     tabInst.onclick = () => {

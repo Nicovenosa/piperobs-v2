@@ -29,7 +29,8 @@ export class MiniPlayer {
     logo.id = 'piperobs-mp-logo';
     const logoSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     logoSvg.setAttribute('viewBox', '0 0 32 32');
-    logoSvg.setAttribute('style', 'width:20px;height:20px');
+    logoSvg.style.width = '20px';
+    logoSvg.style.height = '20px';
     const logoPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     logoPath.setAttribute('d', 'M4 4 Q4 2 6 2 L26 2 Q28 2 28 4 L28 20 Q28 22 26 22 L20 22 L16 28 L12 22 L6 22 Q4 22 4 20 Z');
     logoPath.setAttribute('fill', 'white');
