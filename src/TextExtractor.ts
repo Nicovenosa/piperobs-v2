@@ -58,7 +58,7 @@ interface MutableWord {
 }
 
 const SENTENCE_END_RE = /[.!?…]+(?:["')\]]+)?$/;
-const MARKDOWN_TRIM_RE = /^[#*_~|>\-+[\]()"'`]+|[#*_~|[\]()"'`]+$/g;
+const MARKDOWN_TRIM_RE = /^[#*_~|>\-+\[\]()"'`]+|[#*_~|[\]()"'`]+$/g;
 const LEADING_LIST_RE = /^(\s*(?:[-*+]\s+|\d+[.)]\s+|#{1,6}\s+|>\s+))+/;
 const URL_RE = /^https?:\/\//i;
 const TABLE_LINE_RE = /^\s*\|.*\|.*$/;
@@ -74,7 +74,7 @@ const SECTION_NUMBER_RE = /^\d+(?:\.\d+)*[.)]?$/;
 export function normalizeComparableText(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[#*_`~|>\[\]()¿¡«»"'']/g, '')
+    .replace(/[#*_`~|>[]()¿¡«»"'']/g, '')
     .replace(/\$\$[^$]+\$\$/g, '')
     .replace(/\$[^$]+\$/g, '')
     .replace(/[.,;:!?…]+/g, ' ')
@@ -228,7 +228,7 @@ function splitPhrases(words: ExtractedWord[], paragraphIndex: number): Extracted
 function toSpeechWord(text: string): string {
   return text
     .replace(/[;:!?…]+$/g, '')
-    .replace(/^["'“”‘’]+|["'“”‘’]+$/g, '')
+    .replace(/^["'""''']+|["'""''']+$/g, '')
     .trim();
 }
 
@@ -251,7 +251,7 @@ function buildDocument(raw: string, baseOffset: number): ExtractedSpeechDocument
   const paragraphs: ExtractedParagraph[] = [];
   const lines = raw.split('\n');
 
-  let docTextParts: string[] = [];
+  const docTextParts: string[] = [];
   let cleanOffset = 0;
   let currentParagraphWords: MutableWord[] = [];
   let inFence = false;

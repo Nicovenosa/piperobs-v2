@@ -19,7 +19,7 @@ export class MiniPlayer {
   private buildDOM() {
     this.container = document.createElement('div');
     this.container.className = 'piperobs-miniplayer';
-    this.container.style.display = 'none';
+    this.container.classList.add('piperobs-hidden');
 
     const row = document.createElement('div');
     row.className = 'piperobs-mp-row';
@@ -27,14 +27,38 @@ export class MiniPlayer {
     const logo = document.createElement('div');
     logo.className = 'piperobs-mp-logo';
     logo.id = 'piperobs-mp-logo';
-    // Icono simple blanco (ondas) sobre fondo gradiente que cambia con el tema
-    logo.innerHTML = `<svg viewBox="0 0 32 32" style="width:20px;height:20px"><path d="M4 4 Q4 2 6 2 L26 2 Q28 2 28 4 L28 20 Q28 22 26 22 L20 22 L16 28 L12 22 L6 22 Q4 22 4 20 Z" fill="white" opacity="0.95"/><rect x="8"  y="10" width="3" height="9"  rx="1.5" fill="white" opacity="0.9"/><rect x="13" y="7"  width="3" height="12" rx="1.5" fill="white" opacity="0.85"/><rect x="18" y="10" width="3" height="9"  rx="1.5" fill="white" opacity="0.5"/><rect x="23" y="12" width="2" height="7"  rx="1"   fill="white" opacity="0.3"/></svg>`;
+    const logoSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    logoSvg.setAttribute('viewBox', '0 0 32 32');
+    logoSvg.setAttribute('style', 'width:20px;height:20px');
+    const logoPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    logoPath.setAttribute('d', 'M4 4 Q4 2 6 2 L26 2 Q28 2 28 4 L28 20 Q28 22 26 22 L20 22 L16 28 L12 22 L6 22 Q4 22 4 20 Z');
+    logoPath.setAttribute('fill', 'white');
+    logoPath.setAttribute('opacity', '0.95');
+    logoSvg.appendChild(logoPath);
+    const rect1 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect1.setAttribute('x', '8'); rect1.setAttribute('y', '10'); rect1.setAttribute('width', '3'); rect1.setAttribute('height', '9'); rect1.setAttribute('rx', '1.5'); rect1.setAttribute('fill', 'white'); rect1.setAttribute('opacity', '0.9');
+    logoSvg.appendChild(rect1);
+    const rect2 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect2.setAttribute('x', '13'); rect2.setAttribute('y', '7'); rect2.setAttribute('width', '3'); rect2.setAttribute('height', '12'); rect2.setAttribute('rx', '1.5'); rect2.setAttribute('fill', 'white'); rect2.setAttribute('opacity', '0.85');
+    logoSvg.appendChild(rect2);
+    const rect3 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect3.setAttribute('x', '18'); rect3.setAttribute('y', '10'); rect3.setAttribute('width', '3'); rect3.setAttribute('height', '9'); rect3.setAttribute('rx', '1.5'); rect3.setAttribute('fill', 'white'); rect3.setAttribute('opacity', '0.5');
+    logoSvg.appendChild(rect3);
+    const rect4 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect4.setAttribute('x', '23'); rect4.setAttribute('y', '12'); rect4.setAttribute('width', '2'); rect4.setAttribute('height', '7'); rect4.setAttribute('rx', '1'); rect4.setAttribute('fill', 'white'); rect4.setAttribute('opacity', '0.3');
+    logoSvg.appendChild(rect4);
+    logo.appendChild(logoSvg);
 
     const info = document.createElement('div');
     info.className = 'piperobs-mp-info';
     const titleEl = document.createElement('div');
     titleEl.className = 'piperobs-mp-title';
-    titleEl.innerHTML = 'PiperObs <span id="piperobs-mp-paused-badge" style="display:none;font-size:12px;color:#64748b;font-weight:500;margin-left:6px">· pausado</span>';
+    titleEl.appendText('PiperObs ');
+    const pausedBadge = document.createElement('span');
+    pausedBadge.id = 'piperobs-mp-paused-badge';
+    pausedBadge.className = 'piperobs-mp-paused-badge';
+    pausedBadge.setText('· pausado');
+    titleEl.appendChild(pausedBadge);
     const timeEl = document.createElement('div');
     timeEl.className = 'piperobs-mp-time';
     timeEl.id = 'piperobs-mp-time';
@@ -44,7 +68,6 @@ export class MiniPlayer {
     const fill = document.createElement('div');
     fill.className = 'piperobs-mp-fill';
     fill.id = 'piperobs-mp-fill';
-    fill.style.width = '0%';
     track.appendChild(fill);
     info.appendChild(titleEl);
     info.appendChild(timeEl);
@@ -56,7 +79,6 @@ export class MiniPlayer {
     for (let i = 0; i < 12; i++) {
       const bar = document.createElement('div');
       bar.className = 'piperobs-waveform-bar';
-      bar.style.animationDelay = `${i * 0.05}s`;
       waveform.appendChild(bar);
     }
 
@@ -139,7 +161,6 @@ export class MiniPlayer {
     const synthBar = document.createElement('div');
     synthBar.className = 'piperobs-synth-bar';
     synthBar.id = 'piperobs-synth-bar';
-    synthBar.style.display = 'none';
     const spinner = document.createElement('div');
     spinner.className = 'piperobs-spinner';
     const synthText = document.createElement('div');
@@ -155,9 +176,7 @@ export class MiniPlayer {
 
     const controlsWrap = document.createElement('div');
     controlsWrap.id = 'piperobs-mp-controls-wrap';
-    controlsWrap.style.display = 'flex';
-    controlsWrap.style.alignItems = 'center';
-    controlsWrap.style.gap = '10px';
+    controlsWrap.className = 'piperobs-display-flex';
     controlsWrap.appendChild(row);
 
     this.container.appendChild(controlsWrap);
@@ -172,19 +191,27 @@ export class MiniPlayer {
     const synthBar = document.getElementById('piperobs-synth-bar');
     const controlsWrap = document.getElementById('piperobs-mp-controls-wrap');
     if (state === 'synthesizing') {
-      if (synthBar) synthBar.style.display = 'flex';
-      if (controlsWrap) controlsWrap.style.display = 'none';
+      synthBar?.classList.remove('piperobs-hidden');
+      synthBar?.classList.add('piperobs-display-flex');
+      controlsWrap?.classList.add('piperobs-hidden');
+      controlsWrap?.classList.remove('piperobs-display-flex');
     } else {
-      if (synthBar) synthBar.style.display = 'none';
-      if (controlsWrap) controlsWrap.style.display = 'flex';
+      synthBar?.classList.add('piperobs-hidden');
+      synthBar?.classList.remove('piperobs-display-flex');
+      controlsWrap?.classList.remove('piperobs-hidden');
+      controlsWrap?.classList.add('piperobs-display-flex');
       this.updatePlayState(state);
     }
-    this.container.style.display = 'flex';
+    this.container.classList.remove('piperobs-hidden');
+    this.container.classList.add('piperobs-display-flex');
     this.state = state;
   }
 
   hide() {
-    if (this.container) { this.container.style.display = 'none'; }
+    if (this.container) {
+      this.container.classList.add('piperobs-hidden');
+      this.container.classList.remove('piperobs-display-flex');
+    }
     this.state = 'hidden';
   }
 
@@ -193,7 +220,13 @@ export class MiniPlayer {
     const badge = document.getElementById('piperobs-mp-paused-badge');
     const waveform = document.getElementById('piperobs-mp-waveform');
     if (btn) btn.textContent = state === 'playing' ? '\u23F8' : '\u25B6';
-    if (badge) badge.style.display = state === 'paused' ? 'inline' : 'none';
+    if (badge) {
+      if (state === 'paused') {
+        badge.classList.add('piperobs-display-inline');
+      } else {
+        badge.classList.remove('piperobs-display-inline');
+      }
+    }
     if (waveform) waveform.classList.toggle('playing', state === 'playing');
     if (state === 'paused') btn?.classList.add('paused');
     else btn?.classList.remove('paused');
@@ -202,7 +235,7 @@ export class MiniPlayer {
   updateProgress(pct: number, elapsed: string, total: string) {
     const fill = document.getElementById('piperobs-mp-fill');
     const time = document.getElementById('piperobs-mp-time');
-    if (fill) fill.style.width = (pct * 100) + '%';
+    if (fill) fill.style.setProperty('--pobs-mp-width', (pct * 100) + '%');
     if (time) time.textContent = elapsed + ' / ' + total;
   }
 
@@ -222,7 +255,7 @@ export class MiniPlayer {
     else { this.updatePlayState('playing'); this.state = 'playing'; }
   }
 
-  setPomodoro(state: { active: boolean; mode: 'focus' | 'break'; remainingSec: number; totalSec: number; cyclesDone: number } | null) {
+  setPomodoro(_state: { active: boolean; mode: 'focus' | 'break'; remainingSec: number; totalSec: number; cyclesDone: number } | null) {
     // MiniPlayer no muestra pomodoro visualmente, solo lo ignoramos
   }
 

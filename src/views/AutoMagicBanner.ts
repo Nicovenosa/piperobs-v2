@@ -67,7 +67,7 @@ export class AutoMagicBanner {
 
   private getSuggestedVoice(lang: string): InstalledVoice | null {
     const filtered = FEATURED_VOICES.filter(v => v.id.startsWith(lang + '_'));
-    return filtered.length > 0 ? (filtered[0] as any) : null;
+    return filtered.length > 0 ? (filtered[0] as unknown as InstalledVoice) : null;
   }
 
   private renderSuggest(voice: InstalledVoice) {

@@ -1,5 +1,5 @@
-import { Plugin, PluginSettingTab, Setting, WorkspaceLeaf, MarkdownView, Notice, TFile, normalizePath } from 'obsidian';
-import { DEFAULT_SETTINGS, PiperObsSettings, FEATURED_VOICES, DEFAULT_DATA_DIR, KARAOKE_THEMES, KaraokeTheme } from './settings/DEFAULTS';
+import { Plugin, PluginSettingTab, Setting, WorkspaceLeaf, MarkdownView, Notice, TFile, App } from 'obsidian';
+import { DEFAULT_SETTINGS, PiperObsSettings, FEATURED_VOICES, DEFAULT_DATA_DIR, KaraokeTheme, InstalledVoice } from './settings/DEFAULTS';
 import { SidePanelView, VIEW_TYPE, SidebarVoice } from './views/SidePanel';
 import { MiniPlayer } from './views/MiniPlayer';
 import { VoiceModal } from './views/VoiceModal';
@@ -8,7 +8,7 @@ import { AutoMagicBanner } from './views/AutoMagicBanner';
 import { StatusBarItem } from './views/StatusBar';
 import { PiperEngine } from './PiperEngine';
 import { KaraokeHighlighter, karaokeDecorationsExtension } from './KaraokeHighlighter';
-import { extractFromActiveFile } from './TextExtractor';
+import { extractFromActiveFile, ExtractedSpeechDocument } from './TextExtractor';
 import { join } from 'path';
 
 // ─── Pomodoro State ─────────────────────────────────────────────────────────
@@ -35,6 +35,8 @@ export default class PiperObsV2Plugin extends Plugin {
   currentJob: { jobId: string; paragraphs: number } | null = null;
   dismissedBanners: Set<string> = new Set();
   private initialized = false;
+  private _currentPhrase = 0;
+  private _totalPhrases = 0;
 
   // Pomodoro
   pomodoro: PomodoroState = {
@@ -49,19 +51,19 @@ export default class PiperObsV2Plugin extends Plugin {
   private adaptiveBreakMin = POMODORO_BREAK_MIN;
 
   async onload() {
-    console.log('Loading PiperObs v2...');
+    console.debug('Loading PiperObs v2...');
 
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 
     // Guard: clean up any previous failed loads
     try {
       this.app.workspace.detachLeavesOfType(VIEW_TYPE);
-    } catch(e) {}
+    } catch { /* no-op */ }
 
     // Register view
     try {
-      this.registerView(VIEW_TYPE, (leaf: WorkspaceLeaf) => (this.sidePanel = new SidePanelView(leaf)));
-    } catch(e) {
+      this.registerView(VIEW_TYPE, (leaf: WorkspaceLeaf) => new SidePanelView(leaf));
+    } catch {
       console.warn('PiperObs v2: view type ya registrado, continuando...');
     }
 
@@ -73,7 +75,12 @@ export default class PiperObsV2Plugin extends Plugin {
   }
 
   private async initializePlugin() {
-    const dataDir = join((this.app.vault as any).adapter?.basePath || '', this.settings.dataDir || DEFAULT_DATA_DIR);
+    const adapter = this.app.vault.adapter as unknown as { basePath?: string };
+    const dataDir = join(
+      adapter.basePath || '',
+      this.app.vault.configDir,
+      this.settings.dataDir || DEFAULT_DATA_DIR
+    );
 
     const voiceIds = this.settings.installedVoices.map(v => v.id);
     this.engine = new PiperEngine(dataDir, voiceIds);
@@ -99,12 +106,13 @@ export default class PiperObsV2Plugin extends Plugin {
       this.statusBar?.update('synthesizing');
     });
 
-    this.engine.on('synthesis-progress', (data: { current: number; total: number }) => {
+    this.engine.on('synthesis-progress', (data: unknown) => {
+      const progress = data as { current: number; total: number };
       if (this.miniPlayer) {
-        this.miniPlayer.updateSynthProgress(data.current, data.total);
+        this.miniPlayer.updateSynthProgress(progress.current, progress.total);
       }
-      (this as any)._currentPhrase = data.current;
-      (this as any)._totalPhrases = data.total;
+      this._currentPhrase = progress.current;
+      this._totalPhrases = progress.total;
     });
 
     this.engine.on('playback-started', () => {
@@ -124,30 +132,32 @@ export default class PiperObsV2Plugin extends Plugin {
       }
     });
 
-    this.engine.on('phrase-started', (data: any) => {
+    this.engine.on('phrase-started', (data: unknown) => {
       if (this.settings.highlightEnabled && this.karaokeHighlighter) {
-        this.karaokeHighlighter.startPhrase(data);
+        this.karaokeHighlighter.startPhrase(data as { text: string; fullParagraph: string; words: { word: string; start: number; end: number }[]; duration: number; paragraphIndex?: number; phraseIndex?: number });
       }
     });
 
-    this.engine.on('phrase-playing', (data: { phraseStartTime: number }) => {
+    this.engine.on('phrase-playing', (data: unknown) => {
+      const progress = data as { phraseStartTime: number };
       if (this.karaokeHighlighter) {
-        this.karaokeHighlighter.syncToAudio(data.phraseStartTime);
+        this.karaokeHighlighter.syncToAudio(progress.phraseStartTime);
       }
     });
 
-    this.engine.on('progress', (data: { elapsedMs: number; totalMs: number }) => {
-      if (this.miniPlayer && data.totalMs > 0) {
-        const pct = data.elapsedMs / data.totalMs;
-        const elapsed = this.formatMs(data.elapsedMs);
-        const total = this.formatMs(data.totalMs);
+    this.engine.on('progress', (data: unknown) => {
+      const progress = data as { elapsedMs: number; totalMs: number };
+      if (this.miniPlayer && progress.totalMs > 0) {
+        const pct = progress.elapsedMs / progress.totalMs;
+        const elapsed = this.formatMs(progress.elapsedMs);
+        const total = this.formatMs(progress.totalMs);
         this.miniPlayer.updateProgress(pct, elapsed, total);
       }
       if (this.currentJob && this.sidePanel) {
         this.sidePanel.updateInlineProgress(
-          (this as any)._currentPhrase || 1,
-          (this as any)._totalPhrases || 0,
-          this.formatMs(data.elapsedMs)
+          this._currentPhrase || 1,
+          this._totalPhrases || 0,
+          this.formatMs(progress.elapsedMs)
         );
       }
     });
@@ -198,19 +208,19 @@ export default class PiperObsV2Plugin extends Plugin {
       this.currentJob = null;
     });
 
-    this.engine.on('error', (data: any) => {
-      const msg = typeof data === 'string' ? data : (data?.message || JSON.stringify(data));
+    this.engine.on('error', (data: unknown) => {
+      const msg = typeof data === 'string' ? data : ((data as { message?: string })?.message || JSON.stringify(data));
       console.error('[PiperObs] ERROR:', msg, data);
       new Notice(`PiperObs: ${msg}`);
     });
 
-    this.engine.on('download-progress', (data: any) => {
-      progressNotice.setMessage(`PiperObs · ${data.message || 'Descargando...'} ${data.pct ? Math.round(data.pct * 100) + '%' : ''}`);
+    this.engine.on('download-progress', (data: unknown) => {
+      const progress = data as { message?: string; pct?: number };
+      progressNotice.setMessage(`PiperObs · ${progress.message || 'Descargando...'} ${progress.pct ? Math.round(progress.pct * 100) + '%' : ''}`);
     });
 
     // ─── Inicializar engine ───────────────────────────────────────────────
 
-    const initStart = Date.now();
     let lastProgressMsg = '';
 
     try {
@@ -225,11 +235,11 @@ export default class PiperObsV2Plugin extends Plugin {
       progressNotice.hide();
       this.initialized = true;
       this.sidePanel?.updateBridgeStatus(true);
-    } catch (err: any) {
+    } catch (err) {
       progressNotice.hide();
-      const errMsg = err?.message || err?.toString?.() || String(err);
+      const errMsg = err instanceof Error ? err.message : String(err);
       console.error('[PiperObs] Init FAILED:', errMsg);
-      console.error('[PiperObs] Stack:', err?.stack);
+      console.error('[PiperObs] Stack:', err instanceof Error ? err.stack : '');
       new Notice(`PiperObs: ${errMsg.substring(0, 80)}`);
       this.initialized = false;
       this.sidePanel?.updateBridgeStatus(false);
@@ -238,13 +248,13 @@ export default class PiperObsV2Plugin extends Plugin {
     // ─── Comandos ─────────────────────────────────────────────────────────
 
     this.addCommand({
-      id: 'piperobs-v2:read',
+      id: 'read',
       name: 'Leer documento',
-      callback: () => this.startReading(),
+      callback: () => { void this.startReading(); },
     });
 
     this.addCommand({
-      id: 'piperobs-v2:pause',
+      id: 'pause',
       name: 'Pausar/Reanudar',
       callback: () => {
         if (this.engine) {
@@ -259,26 +269,26 @@ export default class PiperObsV2Plugin extends Plugin {
     });
 
     this.addCommand({
-      id: 'piperobs-v2:stop',
+      id: 'stop',
       name: 'Detener',
       callback: () => this.stopReading(),
     });
 
     this.addCommand({
-      id: 'piperobs-v2:next',
+      id: 'next',
       name: 'Siguiente párrafo',
       callback: () => this.seekNext(),
     });
 
     this.addCommand({
-      id: 'piperobs-v2:prev',
+      id: 'prev',
       name: 'Párrafo anterior',
       callback: () => this.seekPrev(),
     });
 
     this.addCommand({
-      id: 'piperobs-v2:toggle-focus',
-      name: 'Toggle modo focus',
+      id: 'toggle-focus',
+      name: 'Alternar modo focus',
       callback: () => this.toggleFocusMode(),
     });
 
@@ -295,27 +305,31 @@ export default class PiperObsV2Plugin extends Plugin {
 
     // ─── Layout y eventos de workspace ────────────────────────────────────
 
-    this.app.workspace.onLayoutReady(async () => {
-      await this.activateSidePanel();
+    this.app.workspace.onLayoutReady(() => {
+      void (async () => {
+        await this.activateSidePanel();
 
-      const currentFile = this.app.workspace.getActiveFile();
-      if (currentFile) {
-        const content = await this.app.vault.cachedRead(currentFile);
-        const words = content.trim().split(/\s+/).length;
-        const minutes = Math.round(words / 200);
-        this.sidePanel?.updateActiveFile(currentFile.basename, words, minutes);
-      }
+        const currentFile = this.app.workspace.getActiveFile();
+        if (currentFile) {
+          const content = await this.app.vault.cachedRead(currentFile);
+          const words = content.trim().split(/\s+/).length;
+          const minutes = Math.round(words / 200);
+          this.sidePanel?.updateActiveFile(currentFile.basename, words, minutes);
+        }
+      })();
     });
 
     this.registerEvent(
-      this.app.workspace.on('file-open', async (file) => {
-        if (file) {
-          const content = await this.app.vault.cachedRead(file);
-          const words = content.trim().split(/\s+/).length;
-          const minutes = Math.round(words / 200);
-          this.sidePanel?.updateActiveFile(file.basename, words, minutes);
-          this.checkAutoMagic(file);
-        }
+      this.app.workspace.on('file-open', (file) => {
+        void (async () => {
+          if (file) {
+            const content = await this.app.vault.cachedRead(file);
+            const words = content.trim().split(/\s+/).length;
+            const minutes = Math.round(words / 200);
+            this.sidePanel?.updateActiveFile(file.basename, words, minutes);
+            this.checkAutoMagic(file);
+          }
+        })();
       })
     );
 
@@ -337,10 +351,10 @@ export default class PiperObsV2Plugin extends Plugin {
 
     const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE);
     if (leaves.length > 0) {
-      const view = leaves[0].view as SidePanelView;
+      const view = leaves[0].view as unknown as SidePanelView;
       this.sidePanel = view;
 
-      this.sidePanel.onRead = () => this.startReading();
+      this.sidePanel.onRead = () => { void this.startReading(); };
       this.sidePanel.onStop = () => this.stopReading();
       this.sidePanel.onPause = () => this.pauseReading();
       this.sidePanel.onResume = () => this.resumeReading();
@@ -349,7 +363,7 @@ export default class PiperObsV2Plugin extends Plugin {
       this.sidePanel.onRateChange = (rate) => this.setRate(rate);
       this.sidePanel.onVolumeChange = (vol) => this.setVolume(vol);
       this.sidePanel.onVoiceChange = (voiceId) => this.changeVoice(voiceId);
-      this.sidePanel.onRestartWithVoice = () => this.restartWithCurrentVoice();
+      this.sidePanel.onRestartWithVoice = () => { void this.restartWithCurrentVoice(); };
       this.sidePanel.onOpenVoiceModal = () => this.openVoiceModal();
       this.sidePanel.onTogglePomodoro = () => this.togglePomodoro();
       this.sidePanel.onSkipPomodoro = () => this.skipPomodoroPhase();
@@ -368,24 +382,24 @@ export default class PiperObsV2Plugin extends Plugin {
   }
 
   onunload() {
-    console.log('Unloading PiperObs v2...');
+    console.debug('Unloading PiperObs v2...');
     this.stopPomodoro();
 
     try {
       this.app.workspace.detachLeavesOfType(VIEW_TYPE);
-    } catch(e) {}
+    } catch { /* no-op */ }
 
     try {
       this.engine?.destroy();
-    } catch(e) {}
+    } catch { /* no-op */ }
 
     try {
       this.miniPlayer?.cleanup();
-    } catch(e) {}
+    } catch { /* no-op */ }
 
     try {
       this.karaokeHighlighter?.clearAll();
-    } catch(e) {}
+    } catch { /* no-op */ }
   }
 
   // ─── Acciones ──────────────────────────────────────────────────────────────
@@ -415,7 +429,7 @@ export default class PiperObsV2Plugin extends Plugin {
     // Limpiar karaoke anterior si existe
     this.karaokeHighlighter?.clearAll();
 
-    let speechDoc: any = null;
+    let speechDoc: ExtractedSpeechDocument | null = null;
     try {
       speechDoc = await extractFromActiveFile(this.app);
       this.karaokeHighlighter?.setSession(speechDoc);
@@ -430,7 +444,7 @@ export default class PiperObsV2Plugin extends Plugin {
 
     this.sidePanel?.updatePlaybackState('synthesizing');
     this.currentJob = { jobId: file.path, paragraphs: speechDoc?.paragraphs?.length || 0 };
-    this.engine.speak(text, this.settings.defaultVoice, this.settings.playbackRate, speechDoc ?? undefined);
+    await this.engine.speak(text, this.settings.defaultVoice, this.settings.playbackRate, speechDoc ?? undefined);
   }
 
   private configureAdaptivePomodoro(estimatedMinutes: number) {
@@ -481,11 +495,11 @@ export default class PiperObsV2Plugin extends Plugin {
   }
 
   private seekNext() {
-    this.engine?.seek('next');
+    void this.engine?.seek('next');
   }
 
   private seekPrev() {
-    this.engine?.seek('prev');
+    void this.engine?.seek('prev');
   }
 
   private setRate(rate: number) {
@@ -527,7 +541,7 @@ export default class PiperObsV2Plugin extends Plugin {
       new Notice('Cambiando a ' + (found?.name || voiceId) + ' y rearrancando desde el inicio...');
       this.stopReading();
       // Pequeña pausa para que el audio se libere
-      setTimeout(() => this.startReading(), 300);
+      setTimeout(() => { void this.startReading(); }, 300);
     } else {
       new Notice('Voz cambiada a ' + (found?.name || voiceId));
     }
@@ -600,7 +614,7 @@ export default class PiperObsV2Plugin extends Plugin {
     modal.open();
   }
 
-  private parseVoiceIdToVoice(voiceId: string): any {
+  private parseVoiceIdToVoice(voiceId: string): InstalledVoice {
     const parts = voiceId.split('-');
     const langRegion = parts[0] || '';
     const lang = langRegion.split('_')[0];
@@ -623,21 +637,18 @@ export default class PiperObsV2Plugin extends Plugin {
   private async downloadVoice(voiceId: string) {
     if (!this.engine) return;
 
-    let featured = FEATURED_VOICES.find(v => v.id === voiceId);
+    let featured: InstalledVoice | undefined = FEATURED_VOICES.find(v => v.id === voiceId) as unknown as InstalledVoice | undefined;
     if (!featured) {
       featured = this.parseVoiceIdToVoice(voiceId);
     }
 
-    const modal = new DownloadModal(this.app, featured as any);
+    const modal = new DownloadModal(this.app, featured);
     modal.onCancel = () => {};
     modal.open();
-
-    let lastPct = 0;
 
     try {
       await this.engine.downloadVoice(voiceId, (msg, pct) => {
         if (pct !== undefined) {
-          lastPct = pct;
           const downloadedMB = pct * featured!.sizeMB;
           const remaining = (1 - pct) * 30;
           modal.setProgress(pct, downloadedMB, featured!.sizeMB / 30, Math.max(0, remaining));
@@ -647,12 +658,13 @@ export default class PiperObsV2Plugin extends Plugin {
       modal.setSuccess();
 
       if (!this.settings.installedVoices.find(v => v.id === voiceId)) {
-        this.settings.installedVoices.push(featured as any);
+        this.settings.installedVoices.push(featured);
         this.saveData(this.settings);
         this.updateSidebarVoices();
       }
-    } catch (err: any) {
-      modal.setError(err.message || 'Error descargando voz');
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : 'Error descargando voz';
+      modal.setError(errMsg);
     }
   }
 
@@ -691,7 +703,7 @@ export default class PiperObsV2Plugin extends Plugin {
       // Al activar Pomodoro, si no está reproduciendo, empieza lectura automáticamente
       this.startPomodoro();
       if (!this.currentJob) {
-        this.startReading();
+        void this.startReading();
       }
     }
   }
@@ -776,27 +788,15 @@ export default class PiperObsV2Plugin extends Plugin {
     this.karaokeHighlighter?.setFocusMode(this.focusModeActive);
     this.sidePanel?.updateFocusMode(this.focusModeActive);
     if (this.focusModeActive) {
-      new Notice('Modo Focus activado 🎯');
+      new Notice('Modo focus activado 🎯');
     } else {
-      new Notice('Modo Focus desactivado');
+      new Notice('Modo focus desactivado');
     }
   }
 
   // ─── Karaoke Theme ─────────────────────────────────────────────────────────
 
   applyThemeVars(theme: KaraokeTheme) {
-    const themeColors: Record<KaraokeTheme, [string, string]> = {
-      gold: ['#fbbf24', '#f59e0b'],
-      cyan: ['#8957e5', '#22d3ee'],
-      magenta: ['#ec4899', '#a855f7'],
-      green: ['#22c55e', '#84cc16'],
-      orange: ['#f97316', '#ef4444'],
-    };
-    const [c1, c2] = themeColors[theme];
-    document.documentElement.style.setProperty('--pobs-accent', c1);
-    document.documentElement.style.setProperty('--pobs-accent-2', c2);
-
-    // Actualizar clase en body para que los overrides de tema en CSS funcionen
     document.body.classList.remove('piperobs-theme-gold', 'piperobs-theme-cyan', 'piperobs-theme-magenta', 'piperobs-theme-green', 'piperobs-theme-orange');
     document.body.classList.add(`piperobs-theme-${theme}`);
   }
@@ -814,7 +814,7 @@ export default class PiperObsV2Plugin extends Plugin {
 class PiperObsV2SettingTab extends PluginSettingTab {
   plugin: PiperObsV2Plugin;
 
-  constructor(app: any, plugin: PiperObsV2Plugin) {
+  constructor(app: App, plugin: PiperObsV2Plugin) {
     super(app, plugin);
     this.plugin = plugin;
   }
@@ -823,7 +823,9 @@ class PiperObsV2SettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl('h3', { text: 'PiperObs v2' });
+    new Setting(containerEl)
+      .setName('PiperObs v2')
+      .setHeading();
 
     new Setting(containerEl)
       .setName('Carpeta de datos')
@@ -832,9 +834,11 @@ class PiperObsV2SettingTab extends PluginSettingTab {
         text
           .setPlaceholder(DEFAULT_DATA_DIR)
           .setValue(this.plugin.settings.dataDir || DEFAULT_DATA_DIR)
-          .onChange(async (value) => {
-            this.plugin.settings.dataDir = value || DEFAULT_DATA_DIR;
-            await this.plugin.saveData(this.plugin.settings);
+          .onChange((value) => {
+            void (async () => {
+              this.plugin.settings.dataDir = value || DEFAULT_DATA_DIR;
+              await this.plugin.saveData(this.plugin.settings);
+            })();
           })
       );
 
@@ -845,9 +849,11 @@ class PiperObsV2SettingTab extends PluginSettingTab {
         text
           .setPlaceholder('es_AR-daniela-high')
           .setValue(this.plugin.settings.defaultVoice)
-          .onChange(async (value) => {
-            this.plugin.settings.defaultVoice = value;
-            await this.plugin.saveData(this.plugin.settings);
+          .onChange((value) => {
+            void (async () => {
+              this.plugin.settings.defaultVoice = value;
+              await this.plugin.saveData(this.plugin.settings);
+            })();
           })
       );
 
@@ -859,11 +865,13 @@ class PiperObsV2SettingTab extends PluginSettingTab {
           .setLimits(0, 100, 1)
           .setValue(Math.round((this.plugin.settings.volume ?? 0.85) * 100))
           .setDynamicTooltip()
-          .onChange(async (value) => {
-            const vol = value / 100;
-            this.plugin.settings.volume = vol;
-            await this.plugin.saveData(this.plugin.settings);
-            this.plugin.engine?.setVolume(vol);
+          .onChange((value) => {
+            void (async () => {
+              const vol = value / 100;
+              this.plugin.settings.volume = vol;
+              await this.plugin.saveData(this.plugin.settings);
+              this.plugin.engine?.setVolume(vol);
+            })();
           })
       );
 
@@ -873,9 +881,11 @@ class PiperObsV2SettingTab extends PluginSettingTab {
       .addToggle(toggle =>
         toggle
           .setValue(this.plugin.settings.highlightEnabled)
-          .onChange(async (value) => {
-            this.plugin.settings.highlightEnabled = value;
-            await this.plugin.saveData(this.plugin.settings);
+          .onChange((value) => {
+            void (async () => {
+              this.plugin.settings.highlightEnabled = value;
+              await this.plugin.saveData(this.plugin.settings);
+            })();
           })
       );
 
@@ -885,9 +895,11 @@ class PiperObsV2SettingTab extends PluginSettingTab {
       .addToggle(toggle =>
         toggle
           .setValue(this.plugin.settings.autoMagicEnabled)
-          .onChange(async (value) => {
-            this.plugin.settings.autoMagicEnabled = value;
-            await this.plugin.saveData(this.plugin.settings);
+          .onChange((value) => {
+            void (async () => {
+              this.plugin.settings.autoMagicEnabled = value;
+              await this.plugin.saveData(this.plugin.settings);
+            })();
           })
       );
 
@@ -897,9 +909,11 @@ class PiperObsV2SettingTab extends PluginSettingTab {
       .addToggle(toggle =>
         toggle
           .setValue(this.plugin.settings.pomodoroEnabled ?? false)
-          .onChange(async (value) => {
-            this.plugin.settings.pomodoroEnabled = value;
-            await this.plugin.saveData(this.plugin.settings);
+          .onChange((value) => {
+            void (async () => {
+              this.plugin.settings.pomodoroEnabled = value;
+              await this.plugin.saveData(this.plugin.settings);
+            })();
           })
       );
 
@@ -914,10 +928,12 @@ class PiperObsV2SettingTab extends PluginSettingTab {
           .addOption('green', 'Verde')
           .addOption('orange', 'Naranja')
           .setValue(this.plugin.settings.karaokeTheme || 'gold')
-          .onChange(async (value) => {
-            this.plugin.settings.karaokeTheme = value as any;
-            await this.plugin.saveData(this.plugin.settings);
-            this.plugin.applyThemeVars(value as KaraokeTheme);
+          .onChange((value) => {
+            void (async () => {
+              this.plugin.settings.karaokeTheme = value as KaraokeTheme;
+              await this.plugin.saveData(this.plugin.settings);
+              this.plugin.applyThemeVars(value as KaraokeTheme);
+            })();
           })
       );
 
@@ -927,7 +943,7 @@ class PiperObsV2SettingTab extends PluginSettingTab {
       .addButton(btn =>
         btn
           .setButtonText('Reinicializar')
-          .onClick(async () => {
+          .onClick(() => {
             this.plugin.engine?.destroy();
             new Notice('Reinicia Obsidian para aplicar los cambios');
           })

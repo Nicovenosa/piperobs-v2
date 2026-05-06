@@ -22,7 +22,7 @@ export interface InstalledVoice {
   isDefault: boolean;
 }
 
-export const DEFAULT_DATA_DIR = '.obsidian/piperobs-data';
+export const DEFAULT_DATA_DIR = 'piperobs-data';
 
 export type KaraokeTheme = 'gold' | 'cyan' | 'magenta' | 'green' | 'orange';
 

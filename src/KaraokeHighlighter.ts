@@ -1,6 +1,6 @@
 import { Extension, StateEffect, StateField } from '@codemirror/state';
 import { Decoration, DecorationSet, EditorView } from '@codemirror/view';
-import { App, MarkdownView, WorkspaceLeaf, MarkdownRenderer, Component } from 'obsidian';
+import { App, MarkdownView, WorkspaceLeaf } from 'obsidian';
 import {
   ExtractedParagraph,
   ExtractedPhrase,
@@ -83,7 +83,6 @@ export const karaokeDecorationsExtension: Extension = [karaokeDecorationsField];
 interface PreviewHighlight {
   paragraphEl: HTMLElement;
   wordSpans: Map<number, HTMLElement>;
-  phraseText: string;
 }
 
 export class KaraokeHighlighter {
@@ -132,7 +131,7 @@ export class KaraokeHighlighter {
   }
 
   private log(...args: unknown[]) {
-    if (this.debug) console.log('[Karaoke]', ...args);
+    if (this.debug) console.debug('[Karaoke]', ...args);
   }
 
   // ─── View discovery ───────────────────────────────────────────────────────
@@ -179,7 +178,7 @@ export class KaraokeHighlighter {
       this.currentEditorView.dispatch({
         effects: [clearKaraokeDecorationsEffect.of()],
       });
-    } catch (_) {}
+    } catch { /* no-op */ }
   }
 
   // ─── Main API ─────────────────────────────────────────────────────────────
@@ -335,7 +334,7 @@ export class KaraokeHighlighter {
             this.currentEditorView.dom.querySelectorAll('.cm-line.pobs-active-line').forEach(el => el.classList.remove('pobs-active-line'));
             lineEl.classList.add('pobs-active-line');
           }
-        } catch (_) {}
+        } catch { /* no-op */ }
       }
     }
 
@@ -408,33 +407,39 @@ export class KaraokeHighlighter {
     const wordSpans = new Map<number, HTMLElement>();
 
     if (phraseIndex >= 0 && match.words.length > 0) {
-      // Reconstruir HTML con spans para cada palabra de la frase
       const before = text.substring(0, phraseIndex);
       const after = text.substring(phraseIndex + phraseText.length);
 
-      const wordTexts = data.words.map(w => w.word);
-      const phraseWordsHTML = wordTexts.map((word, idx) => {
-        return `<span class="piperobs-preview-word" data-word-idx="${idx}">${this.escapeHtml(word)}</span>`;
-      }).join(' ');
+      el.empty();
+      el.appendText(before);
 
-      el.innerHTML = this.escapeHtml(before) + `<span class="piperobs-preview-phrase">${phraseWordsHTML}</span>` + this.escapeHtml(after);
-
-      // Recolectar refs
-      el.querySelectorAll('.piperobs-preview-word').forEach((span, idx) => {
-        wordSpans.set(idx, span as HTMLElement);
+      const phraseSpan = el.createSpan('piperobs-preview-phrase');
+      data.words.forEach((w, idx) => {
+        const wordSpan = phraseSpan.createSpan('piperobs-preview-word');
+        wordSpan.dataset.wordIdx = String(idx);
+        wordSpan.setText(w.word);
+        wordSpans.set(idx, wordSpan);
+        if (idx < data.words.length - 1) {
+          phraseSpan.appendText(' ');
+        }
       });
+
+      el.appendText(after);
     } else {
       // Si no encontramos el texto exacto, marcar todo el párrafo
       el.classList.add('piperobs-preview-phrase');
     }
 
-    return { paragraphEl: el, wordSpans, phraseText };
+    return { paragraphEl: el, wordSpans };
   }
 
   private escapeHtml(text: string): string {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   private renderPreviewState(shouldScroll: boolean): void {
@@ -501,7 +506,7 @@ export class KaraokeHighlighter {
 
   private clearPreviewHighlight(): void {
     if (this.previewHighlight) {
-      const { paragraphEl, phraseText } = this.previewHighlight;
+      const { paragraphEl } = this.previewHighlight;
       // Restaurar texto original si fue modificado
       if (paragraphEl.querySelector('.piperobs-preview-phrase')) {
         // Simple restoration: remove spans and restore text
@@ -524,7 +529,7 @@ export class KaraokeHighlighter {
     const container = view.containerEl.querySelector('.markdown-preview-view, .markdown-reading-view') as HTMLElement;
     if (!container) return;
 
-    this.mutationObserver = new MutationObserver((mutations) => {
+    this.mutationObserver = new MutationObserver(() => {
       if (!this.currentMatch || !this.previewHighlight) return;
       // Si el párrafo fue modificado o removido, re-aplicar highlight
       const paragraphStillThere = container.contains(this.previewHighlight.paragraphEl);

@@ -6,6 +6,11 @@ export class DownloadModal extends Modal {
   state: 'downloading' | 'success' | 'error' = 'downloading';
   onCancel: () => void = () => {};
 
+  private pctEl: HTMLElement | null = null;
+  private fill: HTMLElement | null = null;
+  private leftEl: HTMLElement | null = null;
+  private rightEl: HTMLElement | null = null;
+
   constructor(app: App, voice: InstalledVoice) {
     super(app);
     this.voice = voice;
@@ -44,7 +49,6 @@ export class DownloadModal extends Modal {
     const track = body.createDiv('piperobs-dl-track');
     const fill = track.createDiv('piperobs-dl-fill');
     fill.id = 'piperobs-dl-fill';
-    fill.style.width = '0%';
 
     const meta = body.createDiv('piperobs-dl-meta');
     const leftEl = meta.createDiv();
@@ -59,40 +63,28 @@ export class DownloadModal extends Modal {
       this.close();
     };
 
-    // Store refs
-    (this as any).pctEl = pctEl;
-    (this as any).fill = fill;
-    (this as any).leftEl = leftEl;
-    (this as any).rightEl = rightEl;
+    this.pctEl = pctEl;
+    this.fill = fill;
+    this.leftEl = leftEl;
+    this.rightEl = rightEl;
   }
 
   private renderSuccess() {
     const { contentEl } = this;
     contentEl.empty();
 
-    const body = contentEl.createDiv('piperobs-dl-body');
-    body.style.textAlign = 'center';
-    body.style.paddingTop = '32px';
+    const body = contentEl.createDiv('piperobs-dl-body piperobs-dl-success-body');
 
-    const checkmark = body.createDiv();
-    checkmark.style.fontSize = '48px';
-    checkmark.style.marginBottom = '16px';
+    const checkmark = body.createDiv('piperobs-dl-checkmark');
     checkmark.setText('✓');
 
-    const text = body.createDiv();
-    text.style.fontSize = '15px';
-    text.style.color = '#fff';
-    text.style.marginBottom = '20px';
+    const text = body.createDiv('piperobs-dl-success-text');
     text.setText(`${this.voice.name} listo para usar`);
 
-    const useBtn = body.createEl('button', { cls: 'piperobs-btn-download' });
-    useBtn.style.width = '100%';
+    const useBtn = body.createEl('button', { cls: 'piperobs-btn-download piperobs-width-full piperobs-margin-bottom-12' });
     useBtn.setText('Usar ahora');
-    useBtn.style.marginBottom = '12px';
 
-    const countdown = body.createDiv();
-    countdown.style.fontSize = '12px';
-    countdown.style.color = 'rgba(255,255,255,0.3)';
+    const countdown = body.createDiv('piperobs-font-size-12 piperobs-color-muted-light');
     let secs = 3;
     countdown.setText(`Se cierra en ${secs}s`);
 
@@ -116,49 +108,36 @@ export class DownloadModal extends Modal {
     const { contentEl } = this;
     contentEl.empty();
 
-    const body = contentEl.createDiv('piperobs-dl-body');
-    body.style.textAlign = 'center';
-    body.style.paddingTop = '32px';
+    const body = contentEl.createDiv('piperobs-dl-body piperobs-dl-error-body');
 
-    const icon = body.createDiv();
-    icon.style.fontSize = '48px';
-    icon.style.marginBottom = '16px';
+    const icon = body.createDiv('piperobs-dl-error-icon');
     icon.setText('⚠');
 
-    const text = body.createDiv();
-    text.style.fontSize = '14px';
-    text.style.color = '#fff';
-    text.style.marginBottom = '8px';
+    const text = body.createDiv('piperobs-dl-error-title');
     text.setText('Error descargando voz');
 
-    const errorMsg = body.createDiv();
-    errorMsg.style.fontSize = '12px';
-    errorMsg.style.color = 'rgba(255,255,255,0.4)';
-    errorMsg.style.marginBottom = '20px';
+    const errorMsg = body.createDiv('piperobs-dl-error-msg');
     errorMsg.setText(message);
 
-    const retryBtn = body.createEl('button', { cls: 'piperobs-btn-download' });
-    retryBtn.style.width = '100%';
-    retryBtn.style.marginBottom = '8px';
+    const retryBtn = body.createEl('button', { cls: 'piperobs-btn-download piperobs-width-full piperobs-margin-bottom-8' });
     retryBtn.setText('Reintentar');
     retryBtn.onclick = () => {
       this.state = 'downloading';
       this.renderDownloading();
     };
 
-    const closeBtn = body.createEl('button', { cls: 'piperobs-btn-cancel' });
-    closeBtn.style.width = '100%';
+    const closeBtn = body.createEl('button', { cls: 'piperobs-btn-cancel piperobs-width-full' });
     closeBtn.setText('Cerrar');
     closeBtn.onclick = () => this.close();
   }
 
   setProgress(pct: number, downloadedMB: number, speedMBs: number, etaSecs: number) {
-    const fill = (this as any).fill;
-    const pctEl = (this as any).pctEl;
-    const leftEl = (this as any).leftEl;
-    const rightEl = (this as any).rightEl;
+    const fill = this.fill;
+    const pctEl = this.pctEl;
+    const leftEl = this.leftEl;
+    const rightEl = this.rightEl;
 
-    if (fill) fill.style.width = (pct * 100) + '%';
+    if (fill) fill.style.setProperty('--pobs-dl-width', (pct * 100) + '%');
     if (pctEl) pctEl.setText(Math.round(pct * 100) + '%');
     if (leftEl) leftEl.setText(downloadedMB.toFixed(1) + 'MB / ' + this.voice.sizeMB + 'MB');
     if (rightEl) {

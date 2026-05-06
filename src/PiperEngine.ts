@@ -5,8 +5,6 @@ import { platform, arch } from 'os';
 import { get as httpsGet } from 'https';
 import { get as httpGet } from 'http';
 
-type GlobalURL = typeof URL;
-
 import { ExtractedSpeechDocument } from './TextExtractor';
 
 // ─── Tipos ──────────────────────────────────────────────────────────────────
@@ -36,7 +34,6 @@ interface PhraseAudioItem {
   timings: WordTiming[];
   file: string;
   audioBuffer: AudioBuffer;
-  sampleRate: number;
 }
 
 export type PiperEvent =
@@ -59,7 +56,7 @@ export type PiperEvent =
   | 'download-progress'
   | 'voice-changed';
 
-type Listener = (payload: any) => void;
+type Listener = (payload: unknown) => void;
 
 // ─── Constantes ─────────────────────────────────────────────────────────────
 
@@ -92,14 +89,6 @@ function getPiperDownloadUrl(): string {
 const VOICE_BASE_URL = 'https://huggingface.co/rhasspy/piper-voices/resolve/main';
 
 const PHRASE_END_RE = /[.!?…]+(?:["')\]]+)?$/;
-
-function audioContextSingleton(): AudioContext | null {
-  try {
-    return new AudioContext({ sampleRate: 22050 });
-  } catch {
-    return null;
-  }
-}
 
 // ─── WAV Header parser ──────────────────────────────────────────────────────
 
@@ -163,33 +152,33 @@ export class PiperEngine {
     mkdirSync(join(this.dataDir, 'bin'), { recursive: true });
     mkdirSync(this.voiceDir, { recursive: true });
 
-    console.log('[PiperObs] Data dir:', this.dataDir);
-    console.log('[PiperObs] Bin path:', this.binPath);
-    console.log('[PiperObs] Voice dir:', this.voiceDir);
+    console.debug('[PiperObs] Data dir:', this.dataDir);
+    console.debug('[PiperObs] Bin path:', this.binPath);
+    console.debug('[PiperObs] Voice dir:', this.voiceDir);
 
     if (!existsSync(this.binPath)) {
-      console.log('[PiperObs] Binary not found, downloading...');
+      console.debug('[PiperObs] Binary not found, downloading...');
       await this.downloadPiperBinary(onProgress);
-      console.log('[PiperObs] Binary download complete');
+      console.debug('[PiperObs] Binary download complete');
     } else {
-      console.log('[PiperObs] Binary already exists');
+      console.debug('[PiperObs] Binary already exists');
     }
 
     for (const voiceId of this.activeVoices) {
       const voiceModelPath = join(this.voiceDir, voiceId, voiceId + '.onnx');
       if (!existsSync(voiceModelPath)) {
-        console.log('[PiperObs] Voice not found, downloading:', voiceId);
+        console.debug('[PiperObs] Voice not found, downloading:', voiceId);
         await this.downloadVoice(voiceId, onProgress);
-        console.log('[PiperObs] Voice download complete:', voiceId);
+        console.debug('[PiperObs] Voice download complete:', voiceId);
       } else {
-        console.log('[PiperObs] Voice already exists:', voiceId);
+        console.debug('[PiperObs] Voice already exists:', voiceId);
       }
     }
 
-    console.log('[PiperObs] Checking binary...');
+    console.debug('[PiperObs] Checking binary...');
     try {
       await this.checkBinary();
-      console.log('[PiperObs] Binary check OK');
+      console.debug('[PiperObs] Binary check OK');
       this.emit('connected', { dataDir: this.dataDir });
     } catch (err) {
       console.error('[PiperObs] Binary check FAILED:', err);
@@ -207,7 +196,7 @@ export class PiperEngine {
         if (code === 0) resolve();
         else reject(new Error(`Piper exit code ${code}`));
       });
-      child.on('error', reject);
+      child.on('error', (err) => reject(err));
       setTimeout(() => reject(new Error('Piper binary timeout')), 5000);
     });
   }
@@ -220,11 +209,11 @@ export class PiperEngine {
     return () => this.listeners.get(event)?.delete(listener);
   }
 
-  private emit(event: PiperEvent, payload: any): void {
+  private emit(event: PiperEvent, payload: unknown): void {
     const set = this.listeners.get(event);
     if (!set) return;
     for (const fn of set) {
-      try { fn(payload); } catch (_) {}
+      try { fn(payload); } catch { /* no-op */ }
     }
   }
 
@@ -311,7 +300,7 @@ export class PiperEngine {
     this.emit('synthesis-started', null);
 
     // Queue de frases pre-sintetizadas — solo 1 frase antes de empezar a reproducir
-    const buffer: Array<{ duration: number; timings: WordTiming[]; file: string; audioBuffer: AudioBuffer; sampleRate: number }> = [];
+    const buffer: Array<{ duration: number; timings: WordTiming[]; file: string; audioBuffer: AudioBuffer }> = [];
 
     const _synth = (t: string, v: string, r: number, f: string) => this.synthesize(t, v, r, f);
     const _estDur = (f: string, wc: number) => this.estimateDurationFromFile(f, wc);
@@ -323,11 +312,10 @@ export class PiperEngine {
       // Usar this.currentJob!.voiceId para permitir cambio de voz en vivo
       await _synth(p.text, this.currentJob!.voiceId, this.currentJob?.rate ?? rate, f);
       if (!this.checkGen(gen) || this.currentJob?.abort) throw new Error('aborted');
-      const sampleRate = readWavSampleRate(f);
       const dur = _estDur(f, p.words.length);
       const t = _estTime(p.words, dur);
       const buf = await this.decodeWav(f);
-      return { duration: dur, timings: t, file: f, audioBuffer: buf, sampleRate };
+      return { duration: dur, timings: t, file: f, audioBuffer: buf };
     };
 
     // Pre-llenar buffer: solo 1 frase. Empezar a reproducir tan pronto como esté lista.
@@ -361,7 +349,7 @@ export class PiperEngine {
             const r: PhraseAudioItem = await nextPromise;
             if (this.checkGen(gen) && !this.currentJob?.abort) item = r;
             else { this.safeUnlink(r.file); }
-          } catch {}
+          } catch { /* no-op */ }
           nextPromise = null;
         }
         if (!item && produceIdx < phrases.length) {
@@ -369,7 +357,7 @@ export class PiperEngine {
             const r: PhraseAudioItem = await synthOne(produceIdx++);
             if (this.checkGen(gen) && !this.currentJob?.abort) item = r;
             else { this.safeUnlink(r.file); }
-          } catch {}
+          } catch { /* no-op */ }
         }
         if (!item) break;
       }
@@ -400,7 +388,7 @@ export class PiperEngine {
 
       if (!this.checkGen(gen)) {
         this.safeUnlink(item.file);
-        if (nextPromise) { try { await nextPromise; } catch {} }
+        if (nextPromise) { try { await nextPromise; } catch { /* no-op */ } }
         return;
       }
 
@@ -413,7 +401,7 @@ export class PiperEngine {
           const r = await nextPromise;
           if (this.checkGen(gen) && !this.currentJob?.abort) buffer.push(r);
           else { this.safeUnlink(r.file); }
-        } catch {}
+        } catch { /* no-op */ }
         nextPromise = null;
       }
     }
@@ -449,7 +437,7 @@ export class PiperEngine {
     }
   }
 
-  async stop(): Promise<void> {
+  stop(): void {
     this.playbackGeneration++;
 
     if (this.currentJob) {
@@ -469,12 +457,12 @@ export class PiperEngine {
 
     // Matar audio al instante
     if (this.currentSource) {
-      try { this.currentSource.stop(); } catch (_) {}
-      try { this.currentSource.disconnect(); } catch (_) {}
+      try { this.currentSource.stop(); } catch { /* no-op */ }
+      try { this.currentSource.disconnect(); } catch { /* no-op */ }
       this.currentSource = null;
     }
     if (this.audioCtx) {
-      try { this.audioCtx.close(); } catch (_) {}
+      try { this.audioCtx.close(); } catch { /* no-op */ }
       this.audioCtx = null;
       this.gainNode = null;
     }
@@ -505,12 +493,12 @@ export class PiperEngine {
     }
 
     if (this.currentSource) {
-      try { this.currentSource.stop(); } catch (_) {}
-      try { this.currentSource.disconnect(); } catch (_) {}
+      try { this.currentSource.stop(); } catch { /* no-op */ }
+      try { this.currentSource.disconnect(); } catch { /* no-op */ }
       this.currentSource = null;
     }
     if (this.audioCtx) {
-      try { this.audioCtx.close(); } catch (_) {}
+      try { this.audioCtx.close(); } catch { /* no-op */ }
       this.audioCtx = null;
       this.gainNode = null;
     }
@@ -565,7 +553,7 @@ export class PiperEngine {
   private async continueFromIndex(startIndex: number, gen: number): Promise<void> {
     if (!this.currentJob || startIndex >= this.currentJob.phrases.length) return;
     const { phrases, rate } = this.currentJob;
-    const buffer: Array<{ duration: number; timings: WordTiming[]; file: string; audioBuffer: AudioBuffer; sampleRate: number }> = [];
+    const buffer: Array<{ duration: number; timings: WordTiming[]; file: string; audioBuffer: AudioBuffer }> = [];
 
     const synthOne = async (idx: number): Promise<PhraseAudioItem> => {
       const p = phrases[idx];
@@ -573,11 +561,10 @@ export class PiperEngine {
       // Usar this.currentJob!.voiceId para permitir cambio de voz en vivo
       await this.synthesize(p.text, this.currentJob!.voiceId, this.currentJob?.rate ?? rate, f);
       if (!this.checkGen(gen) || this.currentJob?.abort) throw new Error('aborted');
-      const sampleRate = readWavSampleRate(f);
       const dur = this.estimateDurationFromFile(f, p.words.length);
       const t = this.estimateWordTimings(p.words, dur);
       const buf = await this.decodeWav(f);
-      return { duration: dur, timings: t, file: f, audioBuffer: buf, sampleRate };
+      return { duration: dur, timings: t, file: f, audioBuffer: buf };
     };
 
     // Pre-llenar buffer: solo 1 frase. Empezar a reproducir tan pronto como esté lista.
@@ -606,7 +593,7 @@ export class PiperEngine {
             const r: PhraseAudioItem = await nextPromise;
             if (this.checkGen(gen) && !this.currentJob?.abort) item = r;
             else { this.safeUnlink(r.file); }
-          } catch {}
+          } catch { /* no-op */ }
           nextPromise = null;
         }
         if (!item && produceIdx < phrases.length) {
@@ -614,7 +601,7 @@ export class PiperEngine {
             const r: PhraseAudioItem = await synthOne(produceIdx++);
             if (this.checkGen(gen) && !this.currentJob?.abort) item = r;
             else { this.safeUnlink(r.file); }
-          } catch {}
+          } catch { /* no-op */ }
         }
         if (!item) break;
       }
@@ -638,7 +625,7 @@ export class PiperEngine {
 
       if (!this.checkGen(gen)) {
         this.safeUnlink(item.file);
-        if (nextPromise) { try { await nextPromise; } catch {} }
+        if (nextPromise) { try { await nextPromise; } catch { /* no-op */ } }
         return;
       }
 
@@ -650,7 +637,7 @@ export class PiperEngine {
           const r = await nextPromise;
           if (this.checkGen(gen) && !this.currentJob?.abort) buffer.push(r);
           else { this.safeUnlink(r.file); }
-        } catch {}
+        } catch { /* no-op */ }
         nextPromise = null;
       }
     }
@@ -707,12 +694,12 @@ export class PiperEngine {
       this.audioAbortFn = null;
     }
     if (this.currentSource) {
-      try { this.currentSource.stop(); } catch (_) {}
-      try { this.currentSource.disconnect(); } catch (_) {}
+      try { this.currentSource.stop(); } catch { /* no-op */ }
+      try { this.currentSource.disconnect(); } catch { /* no-op */ }
       this.currentSource = null;
     }
     if (this.audioCtx) {
-      try { this.audioCtx.close(); } catch (_) {}
+      try { this.audioCtx.close(); } catch { /* no-op */ }
       this.audioCtx = null;
     }
     this.nextAudioTime = 0;
@@ -749,7 +736,7 @@ export class PiperEngine {
       });
     }
 
-    try { unlinkSync(archivePath); } catch (_) {}
+    try { unlinkSync(archivePath); } catch { /* no-op */ }
     onProgress?.('Piper TTS listo', 1);
   }
 
@@ -844,7 +831,7 @@ export class PiperEngine {
         }
       });
 
-      child.on('error', reject);
+      child.on('error', (err) => reject(err));
 
       child.stdin.write(text);
       child.stdin.end();
@@ -872,7 +859,7 @@ export class PiperEngine {
     return new Promise((resolve, reject) => {
       ctx.decodeAudioData(arrayBuffer, (decoded) => {
         resolve(this.trimAudioBuffer(decoded));
-      }, reject);
+      }, (err) => reject(err));
     });
   }
 
@@ -1019,7 +1006,7 @@ export class PiperEngine {
   // ─── Limpieza segura ────────────────────────────────────────────────────
 
   private safeUnlink(filePath: string): void {
-    try { unlinkSync(filePath); } catch (_) {}
+    try { unlinkSync(filePath); } catch { /* no-op */ }
   }
 
   private cleanTempFiles(): void {
@@ -1028,9 +1015,9 @@ export class PiperEngine {
         f.startsWith('.temp-phrase') || f.startsWith('.temp-seek')
       );
       files.forEach((f: string) => {
-        try { unlinkSync(join(this.dataDir, f)); } catch (_) {}
+        try { unlinkSync(join(this.dataDir, f)); } catch { /* no-op */ }
       });
-    } catch (_) {}
+    } catch { /* no-op */ }
   }
 
   // ─── Utilidades de descarga ─────────────────────────────────────────────
@@ -1075,7 +1062,7 @@ export class PiperEngine {
         res.on('data', (chunk: Buffer) => {
           received += chunk.length;
           if (total > 0) {
-            try { onProgress(received / total); } catch (_) {}
+            try { onProgress(received / total); } catch { /* no-op */ }
           }
         });
 
@@ -1083,7 +1070,7 @@ export class PiperEngine {
 
         file.on('finish', () => resolve());
         file.on('error', (err) => {
-          try { unlinkSync(destPath); } catch (_) {}
+          try { unlinkSync(destPath); } catch { /* no-op */ }
           reject(err);
         });
       });
