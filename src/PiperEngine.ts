@@ -423,7 +423,9 @@ export class PiperEngine {
   pause(): void {
     if (this.currentJob) {
       this.currentJob.paused = true;
-      this.audioCtx?.suspend();
+      if (this.audioCtx) {
+        this.audioCtx.suspend().catch(() => {});
+      }
       this.emit('paused', null);
     }
   }
@@ -435,7 +437,9 @@ export class PiperEngine {
         this.pauseResolve();
         this.pauseResolve = null;
       }
-      this.audioCtx?.resume();
+      if (this.audioCtx) {
+        this.audioCtx.resume().catch(() => {});
+      }
       this.emit('resumed', null);
     }
   }
@@ -465,7 +469,7 @@ export class PiperEngine {
       this.currentSource = null;
     }
     if (this.audioCtx) {
-      try { this.audioCtx.close(); } catch { /* no-op */ }
+      this.audioCtx.close().catch(() => {});
       this.audioCtx = null;
       this.gainNode = null;
     }
@@ -501,7 +505,7 @@ export class PiperEngine {
       this.currentSource = null;
     }
     if (this.audioCtx) {
-      try { this.audioCtx.close(); } catch { /* no-op */ }
+      this.audioCtx.close().catch(() => {});
       this.audioCtx = null;
       this.gainNode = null;
     }
@@ -704,7 +708,7 @@ export class PiperEngine {
       this.currentSource = null;
     }
     if (this.audioCtx) {
-      try { this.audioCtx.close(); } catch { /* no-op */ }
+      this.audioCtx.close().catch(() => {});
       this.audioCtx = null;
     }
     this.nextAudioTime = 0;
@@ -852,7 +856,7 @@ export class PiperEngine {
       this.gainNode.connect(this.audioCtx.destination);
     }
     if (this.audioCtx.state === 'suspended') {
-      this.audioCtx.resume();
+      this.audioCtx.resume().catch(() => {});
     }
     return this.audioCtx;
   }
