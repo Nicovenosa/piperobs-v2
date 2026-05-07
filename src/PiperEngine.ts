@@ -196,7 +196,7 @@ export class PiperEngine {
         if (code === 0) resolve();
         else reject(new Error(`Piper exit code ${code}`));
       });
-      child.on('error', (err) => reject(err instanceof Error ? err : new Error(String(err))));
+      child.on('error', (err) => reject(new Error(String(err))));
       setTimeout(() => reject(new Error('Piper binary timeout')), 5000);
     });
   }
@@ -735,7 +735,7 @@ export class PiperEngine {
     if (platform() !== 'win32') {
       await new Promise<void>((resolve, reject) => {
         execFile('chmod', ['+x', this.binPath], (err) => {
-          if (err) reject(err instanceof Error ? err : new Error(String(err)));
+          if (err) reject(new Error(String(err)));
           else resolve();
         });
       });
@@ -836,7 +836,7 @@ export class PiperEngine {
         }
       });
 
-      child.on('error', (err) => reject(err instanceof Error ? err : new Error(String(err))));
+      child.on('error', (err) => reject(new Error(String(err))));
 
       child.stdin.write(text);
       child.stdin.end();
@@ -864,7 +864,7 @@ export class PiperEngine {
     return new Promise((resolve, reject) => {
       ctx.decodeAudioData(arrayBuffer, (decoded) => {
         resolve(this.trimAudioBuffer(decoded));
-      }, (err) => reject(err instanceof Error ? err : new Error(String(err))));
+      }, (err) => reject(new Error(String(err))));
     });
   }
 
@@ -1076,11 +1076,11 @@ export class PiperEngine {
         file.on('finish', () => resolve());
         file.on('error', (err) => {
           try { unlinkSync(destPath); } catch { /* no-op */ }
-          reject(err instanceof Error ? err : new Error(String(err)));
+          reject(new Error(String(err)));
         });
       });
 
-      req.on('error', (err) => reject(err instanceof Error ? err : new Error(String(err))));
+      req.on('error', (err) => reject(new Error(String(err))));
       req.setTimeout(120000, () => {
         req.destroy();
         reject(new Error('Timeout descargando'));
@@ -1092,12 +1092,12 @@ export class PiperEngine {
     return new Promise((resolve, reject) => {
       if (archivePath.endsWith('.zip')) {
         execFile('unzip', ['-o', archivePath, '-d', destDir], (err) => {
-          if (err) reject(err instanceof Error ? err : new Error(String(err)));
+          if (err) reject(new Error(String(err)));
           else resolve();
         });
       } else {
         execFile('tar', ['-xzf', archivePath, '-C', destDir], (err) => {
-          if (err) reject(err instanceof Error ? err : new Error(String(err)));
+          if (err) reject(new Error(String(err)));
           else resolve();
         });
       }

@@ -133,7 +133,7 @@ export class SidePanelView extends ItemView {
     const header = document.createElement('div');
     header.className = 'piperobs-help-header';
     const headerTitle = document.createElement('strong');
-    headerTitle.setText('ℹ️ Cómo usar PiperObs');
+    headerTitle.setText('ℹ️ Cómo usar el plugin');
     const closeBtn = document.createElement('button');
     closeBtn.className = 'piperobs-help-close';
     closeBtn.setText('\u2715');

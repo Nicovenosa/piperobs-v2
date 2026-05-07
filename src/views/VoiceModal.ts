@@ -244,7 +244,7 @@ export class VoiceModal extends Modal {
             const moreBtn = body.createEl('button', { cls: 'piperobs-catalog-more' });
             moreBtn.setText('Cargar más voces →');
             moreBtn.onclick = () => {
-              loadCatalog().catch((err: Error) => console.error(err));
+              void loadCatalog().catch(() => {});
             };
           }
         } catch {
@@ -253,7 +253,7 @@ export class VoiceModal extends Modal {
         }
       };
 
-      loadCatalog().catch((err: Error) => console.error(err));
+      void loadCatalog().catch(() => {});
     };
 
     tabInst.onclick = () => {
