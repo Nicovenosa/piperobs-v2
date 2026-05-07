@@ -147,10 +147,10 @@ export class SidePanelView extends ItemView {
     const sections: Array<{ title: string; paragraphs: string[]; list?: string[] }> = [
       {
         title: '\u{1F399}️ Lectura de voz',
-        paragraphs: ['Abrí cualquier nota en Obsidian y tocá "Leer documento completo". El plugin sintetiza voz localmente con IA (Piper TTS).'],
+        paragraphs: ['Abrí cualquier nota en Obsidian y tocá "Leer documento completo". El plugin sintetiza voz localmente con IA (piper TTS).'],
       },
       {
-        title: '\u{1F3A8} Resaltado de palabras (Karaoke)',
+        title: '\u{1F3A8} Resaltado de palabras (karaoke)',
         paragraphs: ['Solo funciona en modo edición (editor de texto), no en modo lectura/preview. Cambiá al modo edición desde el icono de lápiz arriba a la derecha del documento.', 'En modo preview se resalta el párrafo activo pero no palabra por palabra.'],
       },
       {

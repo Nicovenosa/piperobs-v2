@@ -387,8 +387,8 @@ export class KaraokeHighlighter {
     if (!targetParagraph) {
       // Fallback: buscar por contenido de texto
       const found = paragraphs.find(p => p.textContent?.includes(match.paragraph.text.substring(0, 40)));
-      if (!found) return;
-      this.previewHighlight = this.wrapWordsInElement(found as HTMLElement, match, data);
+      if (!found || !(found instanceof HTMLElement)) return;
+      this.previewHighlight = this.wrapWordsInElement(found, match, data);
     } else {
       this.previewHighlight = this.wrapWordsInElement(targetParagraph, match, data);
     }

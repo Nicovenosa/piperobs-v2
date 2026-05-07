@@ -182,7 +182,7 @@ export class PiperEngine {
       this.emit('connected', { dataDir: this.dataDir });
     } catch (err) {
       console.error('[PiperObs] Binary check FAILED:', err);
-      this.emit('error', { message: 'Piper binary check failed', err });
+      this.emit('error', { message: 'piper binary check failed', err });
       return;
     }
   }
@@ -194,10 +194,10 @@ export class PiperEngine {
       });
       child.on('close', code => {
         if (code === 0) resolve();
-        else reject(new Error(`Piper exit code ${code}`));
+        else reject(new Error(`piper exit code ${code}`));
       });
-      child.on('error', (err) => reject(new Error(String(err))));
-      setTimeout(() => reject(new Error('Piper binary timeout')), 5000);
+      child.on('error', (err) => reject(new Error(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Error desconocido')));
+      setTimeout(() => reject(new Error('piper binary timeout')), 5000);
     });
   }
 
@@ -378,7 +378,7 @@ export class PiperEngine {
         duration: item.duration,
         paragraphIndex: phrase.paragraphIndex,
         phraseIndex: phrase.phraseIndex,
-      } as PhraseStartData);
+      });
 
       // Sintetizar siguiente en background ANTES de reproducir
       if (!nextPromise && produceIdx < phrases.length) {
@@ -532,7 +532,7 @@ export class PiperEngine {
         duration,
         paragraphIndex: phrase.paragraphIndex,
         phraseIndex: phrase.phraseIndex,
-      } as PhraseStartData);
+      });
 
       await this.playAudio(seekAudioBuffer, gen);
 
@@ -618,7 +618,7 @@ export class PiperEngine {
         duration: item.duration,
         paragraphIndex: phrase.paragraphIndex,
         phraseIndex: phrase.phraseIndex,
-      } as PhraseStartData);
+      });
 
       if (!nextPromise && produceIdx < phrases.length) {
         nextPromise = synthOne(produceIdx++);
@@ -723,26 +723,26 @@ export class PiperEngine {
     const archiveName = getPiperBinaryName();
     const archivePath = join(this.dataDir, 'bin', archiveName);
 
-    onProgress?.('Descargando Piper TTS...', 0);
+    onProgress?.('Descargando piper TTS...', 0);
 
     await this.downloadFile(url, archivePath, (pct) => {
-      onProgress?.('Descargando Piper TTS...', pct * 0.8);
+      onProgress?.('Descargando piper TTS...', pct * 0.8);
     });
 
-    onProgress?.('Extrayendo Piper TTS...', 0.85);
+    onProgress?.('Extrayendo piper TTS...', 0.85);
     await this.extractArchive(archivePath, join(this.dataDir, 'bin'));
 
     if (platform() !== 'win32') {
       await new Promise<void>((resolve, reject) => {
         execFile('chmod', ['+x', this.binPath], (err) => {
-          if (err) reject(new Error(String(err)));
+          if (err) reject(new Error(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Error desconocido'));
           else resolve();
         });
       });
     }
 
     try { unlinkSync(archivePath); } catch { /* no-op */ }
-    onProgress?.('Piper TTS listo', 1);
+    onProgress?.('piper TTS listo', 1);
   }
 
   async downloadVoice(voiceId: string, onProgress?: (msg: string, pct?: number) => void): Promise<void> {
@@ -832,11 +832,11 @@ export class PiperEngine {
         if (code === 0) {
           resolve();
         } else {
-          reject(new Error(`Piper exit ${code}: ${stderr}`));
+          reject(new Error(`piper exit ${code}: ${stderr}`));
         }
       });
 
-      child.on('error', (err) => reject(new Error(String(err))));
+      child.on('error', (err) => reject(new Error(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Error desconocido')));
 
       child.stdin.write(text);
       child.stdin.end();
@@ -864,7 +864,7 @@ export class PiperEngine {
     return new Promise((resolve, reject) => {
       ctx.decodeAudioData(arrayBuffer, (decoded) => {
         resolve(this.trimAudioBuffer(decoded));
-      }, (err) => reject(new Error(String(err))));
+      }, (err) => reject(new Error(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Error desconocido')));
     });
   }
 
@@ -1076,11 +1076,11 @@ export class PiperEngine {
         file.on('finish', () => resolve());
         file.on('error', (err) => {
           try { unlinkSync(destPath); } catch { /* no-op */ }
-          reject(new Error(String(err)));
+          reject(new Error(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Error desconocido'));
         });
       });
 
-      req.on('error', (err) => reject(new Error(String(err))));
+      req.on('error', (err) => reject(new Error(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Error desconocido')));
       req.setTimeout(120000, () => {
         req.destroy();
         reject(new Error('Timeout descargando'));
@@ -1092,12 +1092,12 @@ export class PiperEngine {
     return new Promise((resolve, reject) => {
       if (archivePath.endsWith('.zip')) {
         execFile('unzip', ['-o', archivePath, '-d', destDir], (err) => {
-          if (err) reject(new Error(String(err)));
+          if (err) reject(new Error(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Error desconocido'));
           else resolve();
         });
       } else {
         execFile('tar', ['-xzf', archivePath, '-C', destDir], (err) => {
-          if (err) reject(new Error(String(err)));
+          if (err) reject(new Error(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Error desconocido'));
           else resolve();
         });
       }
