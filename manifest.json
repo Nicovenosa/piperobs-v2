@@ -1,7 +1,7 @@
 {
   "id": "piperobs-v2",
   "name": "PiperObs v2",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "minAppVersion": "1.5.0",
   "description": "Local TTS with karaoke highlight, pomodoro timer, 5 color themes, and offline voice synthesis.",
   "author": "Nicolas Venosa",

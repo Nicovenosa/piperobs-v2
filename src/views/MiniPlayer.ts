@@ -165,7 +165,7 @@ export class MiniPlayer {
     spinner.className = 'piperobs-spinner';
     const synthText = activeDocument.createDiv();
     synthText.className = 'piperobs-synth-text';
-    synthText.textContent = 'Preparando audio...';
+    synthText.textContent = 'preparando audio...';
     const synthProg = activeDocument.createDiv();
     synthProg.className = 'piperobs-synth-prog';
     synthProg.id = 'piperobs-synth-prog';

@@ -210,7 +210,7 @@ export class SidePanelView extends ItemView {
     const header = root.createDiv('piperobs-sidebar-header');
     header.appendChild(makeLogoMark());
     const title = header.createDiv('piperobs-header-title');
-    title.setText('Piperobs v2');
+    title.setText('piperobs v2');
     const dot = activeDocument.createDiv();
     dot.className = 'piperobs-status-dot';
     header.appendChild(dot);
@@ -316,7 +316,7 @@ export class SidePanelView extends ItemView {
     const themeLabel = themePanel.createDiv('piperobs-theme-label');
     themeLabel.createSpan().setText('Tema de resaltado');
     this.el.themePreview = themeLabel.createSpan('piperobs-theme-preview');
-    this.el.themePreview.setText('Violeta/cyan');
+    this.el.themePreview.setText('violeta/cyan');
     const presets = themePanel.createDiv('piperobs-color-presets');
     const themeMap: Record<KaraokeTheme, { name: string }> = {
       gold: { name: 'Oro' },
@@ -348,7 +348,7 @@ export class SidePanelView extends ItemView {
     const wpmChip = statsRow.createDiv('piperobs-stat-chip');
     this.el.statWPM = wpmChip.createDiv('piperobs-stat-value');
     this.el.statWPM.setText('--');
-    wpmChip.createDiv('piperobs-stat-label').setText('Pal/min');
+    wpmChip.createDiv('piperobs-stat-label').setText('pal/min');
     const timeChip = statsRow.createDiv('piperobs-stat-chip');
     this.el.statTime = timeChip.createDiv('piperobs-stat-value');
     this.el.statTime.setText('--');

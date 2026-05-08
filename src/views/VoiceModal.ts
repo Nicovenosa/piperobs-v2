@@ -140,7 +140,7 @@ export class VoiceModal extends Modal {
       searchInput.addEventListener('input', applyFiltersAndSearch);
 
       // Featured voices
-      body.createDiv('piperobs-section-label').setText('Destacadas');
+      body.createDiv('piperobs-section-label').setText('destacadas');
       FEATURED_VOICES.forEach(f => {
         const installed = this.installedVoices.find(v => v.id === f.id);
         const row = body.createDiv('piperobs-voice-row');
@@ -169,7 +169,7 @@ export class VoiceModal extends Modal {
 
       // Catalog section
       body.createDiv('piperobs-divider');
-      body.createDiv('piperobs-section-label').setText('Catálogo completo · 150+ voces');
+      body.createDiv('piperobs-section-label').setText('catálogo completo · 150+ voces');
 
       const catalogSection = body.createDiv();
       let catalogOffset = 0;
