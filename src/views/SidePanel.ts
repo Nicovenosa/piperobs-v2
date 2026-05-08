@@ -210,7 +210,7 @@ export class SidePanelView extends ItemView {
     const header = root.createDiv('piperobs-sidebar-header');
     header.appendChild(makeLogoMark());
     const title = header.createDiv('piperobs-header-title');
-    title.setText('PiperObs');
+    title.setText('PiperObs v2');
     const dot = document.createElement('div');
     dot.className = 'piperobs-status-dot';
     header.appendChild(dot);
