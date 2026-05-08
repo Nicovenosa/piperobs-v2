@@ -1,4 +1,4 @@
-import { Plugin, PluginSettingTab, Setting, WorkspaceLeaf, MarkdownView, Notice, TFile, App } from 'obsidian';
+import { Plugin, PluginSettingTab, Setting, WorkspaceLeaf, MarkdownView, Notice, TFile, App, FileSystemAdapter } from 'obsidian';
 import { DEFAULT_SETTINGS, PiperObsSettings, FEATURED_VOICES, DEFAULT_DATA_DIR, KaraokeTheme, InstalledVoice, KARAOKE_THEMES } from './settings/DEFAULTS';
 import { SidePanelView, VIEW_TYPE, SidebarVoice } from './views/SidePanel';
 import { MiniPlayer } from './views/MiniPlayer';
@@ -75,9 +75,13 @@ export default class PiperObsV2Plugin extends Plugin {
   }
 
   private async initializePlugin() {
-    const adapter = this.app.vault.adapter as unknown as { basePath?: string };
+    const adapter = this.app.vault.adapter;
+    let basePath = '';
+    if (adapter instanceof FileSystemAdapter) {
+      basePath = adapter.getBasePath();
+    }
     const dataDir = join(
-      adapter.basePath || '',
+      basePath,
       this.app.vault.configDir,
       this.settings.dataDir || DEFAULT_DATA_DIR
     );
