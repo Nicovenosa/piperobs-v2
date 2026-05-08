@@ -197,7 +197,7 @@ export class PiperEngine {
         else reject(new Error(`piper exit code ${code}`));
       });
       child.on('error', (err) => reject(new Error(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Error desconocido')));
-      setTimeout(() => reject(new Error('piper binary timeout')), 5000);
+      activeWindow.setTimeout(() => reject(new Error('piper binary timeout')), 5000);
     });
   }
 
@@ -865,11 +865,12 @@ export class PiperEngine {
     const buffer = readFileSync(filePath);
     const ctx = this.getAudioContext();
     const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
-    return new Promise((resolve, reject) => {
-      ctx.decodeAudioData(arrayBuffer, (decoded) => {
-        resolve(this.trimAudioBuffer(decoded));
-      }, (err) => reject(new Error(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Error desconocido')));
-    });
+    try {
+      const decoded = await ctx.decodeAudioData(arrayBuffer);
+      return this.trimAudioBuffer(decoded);
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Error desconocido');
+    }
   }
 
   // Recorta silencio al inicio y final del buffer (padding que genera Piper)
@@ -940,7 +941,7 @@ export class PiperEngine {
 
         // Emitir phrase-playing exactamente cuando la frase empieza a sonar
         const delayUntilStart = Math.max(0, (when - ctx.currentTime) * 1000);
-        setTimeout(() => {
+        activeWindow.setTimeout(() => {
           this.emit('phrase-playing', { phraseStartTime: performance.now() });
           if (when <= ctx.currentTime) {
             this.emit('playback-started', null);

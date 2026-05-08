@@ -54,7 +54,7 @@ export class DownloadModal extends Modal {
     const leftEl = meta.createDiv();
     leftEl.setText('0MB / ' + this.voice.sizeMB + 'MB');
     const rightEl = meta.createDiv();
-    rightEl.setText('-- MB/s');
+    rightEl.setText('-- mb/s');
 
     const cancelBtn = body.createEl('button', { cls: 'piperobs-btn-cancel' });
     cancelBtn.setText('Cancelar');
@@ -88,10 +88,10 @@ export class DownloadModal extends Modal {
     let secs = 3;
     countdown.setText(`Se cierra en ${secs}s`);
 
-    const timer = setInterval(() => {
+    const timer = activeWindow.setInterval(() => {
       secs--;
       if (secs <= 0) {
-        clearInterval(timer);
+        activeWindow.clearInterval(timer);
         this.close();
       } else {
         countdown.setText(`Se cierra en ${secs}s`);
@@ -99,7 +99,7 @@ export class DownloadModal extends Modal {
     }, 1000);
 
     useBtn.onclick = () => {
-      clearInterval(timer);
+      activeWindow.clearInterval(timer);
       this.close();
     };
   }

@@ -78,10 +78,10 @@ export class AutoMagicBanner {
     icon.setText('💡');
 
     const text = container.createDiv('piperobs-banner-text');
-    const mainText = document.createTextNode('Esta nota está en ');
+    const mainText = activeDocument.createTextNode('Esta nota está en ');
     const voiceChip = text.createDiv('piperobs-banner-voice-chip');
     voiceChip.setText(`${voice.flag} ${voice.name}`);
-    const endText = document.createTextNode(' suena ideal.');
+    const endText = activeDocument.createTextNode(' suena ideal.');
 
     text.appendChild(mainText);
     text.appendChild(voiceChip);
@@ -136,7 +136,7 @@ export class AutoMagicBanner {
     icon.setText('✓');
 
     const text = this.bannerEl.createDiv('piperobs-banner-text');
-    const mainText = document.createTextNode('Listo. ¿Cambiar voz ahora?');
+    const mainText = activeDocument.createTextNode('Listo. ¿Cambiar voz ahora?');
     text.appendChild(mainText);
 
     const actions = this.bannerEl.createDiv('piperobs-banner-actions');

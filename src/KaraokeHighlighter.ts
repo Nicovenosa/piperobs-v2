@@ -118,7 +118,7 @@ export class KaraokeHighlighter {
 
   setFocusMode(active: boolean): void {
     this.focusModeActive = active;
-    document.body.classList.toggle('piperobs-focus-active', active);
+    activeDocument.body.classList.toggle('piperobs-focus-active', active);
   }
 
   /** Sincroniza el reloj del karaoke con el momento exacto en que el audio empieza a sonar */
@@ -287,7 +287,7 @@ export class KaraokeHighlighter {
     this.activePhraseKey = '';
     this.currentEditorView = null;
     this.currentViewMode = null;
-    document.body.classList.remove('piperobs-focus-active');
+    activeDocument.body.classList.remove('piperobs-focus-active');
   }
 
   // ─── Editor mode rendering ────────────────────────────────────────────────
@@ -387,7 +387,7 @@ export class KaraokeHighlighter {
     if (!targetParagraph) {
       // Fallback: buscar por contenido de texto
       const found = paragraphs.find(p => p.textContent?.includes(match.paragraph.text.substring(0, 40)));
-      if (!found || !(found instanceof HTMLElement)) return;
+      if (!found || !(found.instanceOf(HTMLElement))) return;
       this.previewHighlight = this.wrapWordsInElement(found, match, data);
     } else {
       this.previewHighlight = this.wrapWordsInElement(targetParagraph, match, data);
@@ -512,7 +512,7 @@ export class KaraokeHighlighter {
         // Simple restoration: remove spans and restore text
         const spans = paragraphEl.querySelectorAll('.piperobs-preview-word');
         spans.forEach(span => {
-          const text = document.createTextNode(span.textContent || '');
+          const text = activeDocument.createTextNode(span.textContent || '');
           span.parentNode?.insertBefore(text, span);
           span.remove();
         });

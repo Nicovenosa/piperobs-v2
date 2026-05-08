@@ -263,7 +263,7 @@ export default class PiperObsV2Plugin extends Plugin {
 
     this.addCommand({
       id: 'pause',
-      name: 'Pausar/Reanudar',
+      name: 'Pausar o reanudar',
       callback: () => {
         if (this.engine) {
           if (this.currentJob) {
@@ -353,7 +353,7 @@ export default class PiperObsV2Plugin extends Plugin {
       }
     }
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => activeWindow.setTimeout(resolve, 100));
 
     const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE);
     if (leaves.length > 0) {
@@ -553,7 +553,7 @@ export default class PiperObsV2Plugin extends Plugin {
       new Notice('Cambiando a ' + (found?.name || voiceId) + ' y rearrancando desde el inicio...');
       this.stopReading();
       // Pequeña pausa para que el audio se libere
-      setTimeout(() => { this.startReading().catch(() => {}); }, 300);
+      activeWindow.setTimeout(() => { this.startReading().catch(() => {}); }, 300);
     } else {
       new Notice('Voz cambiada a ' + (found?.name || voiceId));
     }
@@ -620,7 +620,7 @@ export default class PiperObsV2Plugin extends Plugin {
     };
 
     modal.onDownloadVoice = (voiceId: string) => {
-      this.downloadVoice(voiceId);
+      this.downloadVoice(voiceId).catch(() => {});
     };
 
     modal.open();
@@ -658,12 +658,15 @@ export default class PiperObsV2Plugin extends Plugin {
     modal.onCancel = () => {};
     modal.open();
 
+    const voice = featured;
+    if (!voice) return;
+
     try {
       await this.engine.downloadVoice(voiceId, (msg, pct) => {
         if (pct !== undefined) {
-          const downloadedMB = pct * featured!.sizeMB;
+          const downloadedMB = pct * voice.sizeMB;
           const remaining = (1 - pct) * 30;
-          modal.setProgress(pct, downloadedMB, featured!.sizeMB / 30, Math.max(0, remaining));
+          modal.setProgress(pct, downloadedMB, voice.sizeMB / 30, Math.max(0, remaining));
         }
       });
 
@@ -696,7 +699,7 @@ export default class PiperObsV2Plugin extends Plugin {
 
     const banner = new AutoMagicBanner(view, voice);
     banner.onDownload = (voiceId) => {
-      this.downloadVoice(voiceId);
+      this.downloadVoice(voiceId).catch(() => {});
     };
     banner.onUseNow = (voiceId) => {
       this.settings.defaultVoice = voiceId;
@@ -809,8 +812,8 @@ export default class PiperObsV2Plugin extends Plugin {
   // ─── Karaoke Theme ─────────────────────────────────────────────────────────
 
   applyThemeVars(theme: KaraokeTheme) {
-    document.body.classList.remove('piperobs-theme-gold', 'piperobs-theme-cyan', 'piperobs-theme-magenta', 'piperobs-theme-green', 'piperobs-theme-orange');
-    document.body.classList.add(`piperobs-theme-${theme}`);
+    activeDocument.body.classList.remove('piperobs-theme-gold', 'piperobs-theme-cyan', 'piperobs-theme-magenta', 'piperobs-theme-green', 'piperobs-theme-orange');
+    activeDocument.body.classList.add(`piperobs-theme-${theme}`);
   }
 
   private setKaraokeTheme(theme: KaraokeTheme) {
@@ -853,7 +856,7 @@ class PiperObsV2SettingTab extends PluginSettingTab {
       .setDesc('Voz que se usa para leer los documentos')
       .addText(text =>
         text
-          .setPlaceholder('es_AR-daniela-high')
+          .setPlaceholder('Voz predeterminada')
           .setValue(this.plugin.settings.defaultVoice)
           .onChange((value) => {
             this.plugin.settings.defaultVoice = value;

@@ -4,23 +4,23 @@ import { KaraokeTheme } from '../settings/DEFAULTS';
 export const VIEW_TYPE = 'piperobs-v2-panel-2025';
 
 function makeLogoMark(): SVGElement {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const svg = activeDocument.createSvg('svg');
   svg.setAttribute('viewBox', '0 0 32 32');
   svg.setAttribute('width', '28');
   svg.setAttribute('height', '28');
   svg.setAttribute('class', 'piperobs-logo-mark');
 
-  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-  const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+  const defs = activeDocument.createSvg('defs');
+  const grad = activeDocument.createSvg('linearGradient');
   grad.setAttribute('id', 'pobs-logo-grad');
   grad.setAttribute('x1', '4');
   grad.setAttribute('y1', '2');
   grad.setAttribute('x2', '28');
   grad.setAttribute('y2', '22');
-  const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+  const stop1 = activeDocument.createSvg('stop');
   stop1.setAttribute('offset', '0%');
   stop1.setAttribute('stop-color', '#8957e5');
-  const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+  const stop2 = activeDocument.createSvg('stop');
   stop2.setAttribute('offset', '100%');
   stop2.setAttribute('stop-color', '#22d3ee');
   grad.appendChild(stop1);
@@ -28,21 +28,21 @@ function makeLogoMark(): SVGElement {
   defs.appendChild(grad);
   svg.appendChild(defs);
 
-  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const path = activeDocument.createSvg('path');
   path.setAttribute('d', 'M4 4 Q4 2 6 2 L26 2 Q28 2 28 4 L28 20 Q28 22 26 22 L20 22 L16 28 L12 22 L6 22 Q4 22 4 20 Z');
   path.setAttribute('fill', 'url(#pobs-logo-grad)');
   svg.appendChild(path);
 
-  const r1 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  const r1 = activeDocument.createSvg('rect');
   r1.setAttribute('x', '8'); r1.setAttribute('y', '10'); r1.setAttribute('width', '3'); r1.setAttribute('height', '9'); r1.setAttribute('rx', '1.5'); r1.setAttribute('fill', '#22D3EE');
   svg.appendChild(r1);
-  const r2 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  const r2 = activeDocument.createSvg('rect');
   r2.setAttribute('x', '13'); r2.setAttribute('y', '7'); r2.setAttribute('width', '3'); r2.setAttribute('height', '12'); r2.setAttribute('rx', '1.5'); r2.setAttribute('fill', 'white'); r2.setAttribute('opacity', '0.9');
   svg.appendChild(r2);
-  const r3 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  const r3 = activeDocument.createSvg('rect');
   r3.setAttribute('x', '18'); r3.setAttribute('y', '10'); r3.setAttribute('width', '3'); r3.setAttribute('height', '9'); r3.setAttribute('rx', '1.5'); r3.setAttribute('fill', 'white'); r3.setAttribute('opacity', '0.5');
   svg.appendChild(r3);
-  const r4 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  const r4 = activeDocument.createSvg('rect');
   r4.setAttribute('x', '23'); r4.setAttribute('y', '12'); r4.setAttribute('width', '2'); r4.setAttribute('height', '7'); r4.setAttribute('rx', '1'); r4.setAttribute('fill', 'white'); r4.setAttribute('opacity', '0.3');
   svg.appendChild(r4);
 
@@ -50,26 +50,26 @@ function makeLogoMark(): SVGElement {
 }
 
 function makePlayIcon(): SVGElement {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const svg = activeDocument.createSvg('svg');
   svg.setAttribute('width', '14');
   svg.setAttribute('height', '14');
   svg.setAttribute('viewBox', '0 0 16 16');
   svg.setAttribute('fill', 'white');
-  const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  const polygon = activeDocument.createSvg('polygon');
   polygon.setAttribute('points', '4,2 14,8 4,14');
   svg.appendChild(polygon);
   return svg;
 }
 
 function makePauseIcon(): SVGElement {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const svg = activeDocument.createSvg('svg');
   svg.setAttribute('width', '14');
   svg.setAttribute('height', '14');
   svg.setAttribute('viewBox', '0 0 16 16');
   svg.setAttribute('fill', 'white');
-  const rect1 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  const rect1 = activeDocument.createSvg('rect');
   rect1.setAttribute('x', '4'); rect1.setAttribute('y', '2'); rect1.setAttribute('width', '4'); rect1.setAttribute('height', '12'); rect1.setAttribute('rx', '1');
-  const rect2 = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  const rect2 = activeDocument.createSvg('rect');
   rect2.setAttribute('x', '10'); rect2.setAttribute('y', '2'); rect2.setAttribute('width', '4'); rect2.setAttribute('height', '12'); rect2.setAttribute('rx', '1');
   svg.appendChild(rect1);
   svg.appendChild(rect2);
@@ -116,32 +116,32 @@ export class SidePanelView extends ItemView {
   }
 
   getViewType() { return VIEW_TYPE; }
-  getDisplayText() { return 'PiperObs'; }
+  getDisplayText() { return 'Piperobs v2'; }
   getIcon() { return 'headphones'; }
 
   private showHelpModal() {
-    const modal = document.createElement('div');
+    const modal = activeDocument.createDiv();
     modal.className = 'piperobs-help-modal';
 
-    const backdrop = document.createElement('div');
+    const backdrop = activeDocument.createDiv();
     backdrop.className = 'piperobs-help-backdrop';
     backdrop.onclick = () => modal.remove();
 
-    const content = document.createElement('div');
+    const content = activeDocument.createDiv();
     content.className = 'piperobs-help-content';
 
-    const header = document.createElement('div');
+    const header = activeDocument.createDiv();
     header.className = 'piperobs-help-header';
-    const headerTitle = document.createElement('strong');
-    headerTitle.setText('ℹ️ Cómo usar el plugin');
-    const closeBtn = document.createElement('button');
+    const headerTitle = activeDocument.createEl('strong');
+    headerTitle.setText('ℹ️ cómo usar el plugin');
+    const closeBtn = activeDocument.createEl('button');
     closeBtn.className = 'piperobs-help-close';
     closeBtn.setText('\u2715');
     closeBtn.onclick = () => modal.remove();
     header.appendChild(headerTitle);
     header.appendChild(closeBtn);
 
-    const body = document.createElement('div');
+    const body = activeDocument.createDiv();
     body.className = 'piperobs-help-body';
 
     const sections: Array<{ title: string; paragraphs: string[]; list?: string[] }> = [
@@ -173,20 +173,20 @@ export class SidePanelView extends ItemView {
     ];
 
     sections.forEach(sec => {
-      const sectionEl = document.createElement('div');
+      const sectionEl = activeDocument.createDiv();
       sectionEl.className = 'piperobs-help-section';
-      const h4 = document.createElement('h4');
+      const h4 = activeDocument.createEl('h4');
       h4.setText(sec.title);
       sectionEl.appendChild(h4);
       sec.paragraphs.forEach(p => {
-        const pEl = document.createElement('p');
+        const pEl = activeDocument.createEl('p');
         pEl.setText(p);
         sectionEl.appendChild(pEl);
       });
       if (sec.list) {
-        const ul = document.createElement('ul');
+        const ul = activeDocument.createEl('ul');
         sec.list.forEach(item => {
-          const li = document.createElement('li');
+          const li = activeDocument.createEl('li');
           li.setText(item);
           ul.appendChild(li);
         });
@@ -199,7 +199,7 @@ export class SidePanelView extends ItemView {
     content.appendChild(body);
     modal.appendChild(backdrop);
     modal.appendChild(content);
-    document.body.appendChild(modal);
+    activeDocument.body.appendChild(modal);
   }
 
   onOpen(): Promise<void> {
@@ -210,17 +210,17 @@ export class SidePanelView extends ItemView {
     const header = root.createDiv('piperobs-sidebar-header');
     header.appendChild(makeLogoMark());
     const title = header.createDiv('piperobs-header-title');
-    title.setText('PiperObs v2');
-    const dot = document.createElement('div');
+    title.setText('Piperobs v2');
+    const dot = activeDocument.createDiv();
     dot.className = 'piperobs-status-dot';
     header.appendChild(dot);
     this.el.dot = dot;
 
     // Botón de ayuda
-    const infoBtn = document.createElement('button');
+    const infoBtn = activeDocument.createEl('button');
     infoBtn.className = 'piperobs-info-btn';
     infoBtn.setText('?');
-    infoBtn.title = '¿Cómo funciona?';
+    infoBtn.title = '¿cómo funciona?';
     infoBtn.onclick = () => this.showHelpModal();
     header.appendChild(infoBtn);
 
@@ -241,10 +241,10 @@ export class SidePanelView extends ItemView {
     secSpeed.setText('Velocidad');
     const speedRow = body.createDiv('piperobs-speed-row');
     const RATES = [0.75, 0.9, 1.0, 1.25, 1.5];
-    const slider = document.createElement('input');
+    const slider = activeDocument.createEl('input');
     slider.type = 'range'; slider.min = '0'; slider.max = '4'; slider.step = '1'; slider.value = '2';
     slider.className = 'piperobs-speed-slider';
-    this.el.speedVal = document.createElement('span');
+    this.el.speedVal = activeDocument.createSpan();
     this.el.speedVal.className = 'piperobs-speed-val';
     this.el.speedVal.textContent = '1.0x';
     slider.addEventListener('input', () => {
@@ -260,13 +260,13 @@ export class SidePanelView extends ItemView {
     const secVolume = body.createDiv('piperobs-section-label');
     secVolume.setText('Volumen');
     const volumeRow = body.createDiv('piperobs-volume-row');
-    const volSlider = document.createElement('input');
+    const volSlider = activeDocument.createEl('input');
     volSlider.type = 'range'; volSlider.min = '0'; volSlider.max = '100'; volSlider.step = '1'; volSlider.value = '85';
     volSlider.className = 'piperobs-volume-slider';
-    this.el.volumeVal = document.createElement('span');
+    this.el.volumeVal = activeDocument.createSpan();
     this.el.volumeVal.className = 'piperobs-volume-val';
     this.el.volumeVal.textContent = '85%';
-    this.el.volumeIcon = document.createElement('span');
+    this.el.volumeIcon = activeDocument.createSpan();
     this.el.volumeIcon.className = 'piperobs-volume-icon';
     this.el.volumeIcon.textContent = '\u{1F50A}';
     volSlider.addEventListener('input', () => {
@@ -287,7 +287,7 @@ export class SidePanelView extends ItemView {
     this.el.voiceFlag = this.el.voiceSel.createSpan('piperobs-voice-flag');
     this.el.voiceFlag.setText('\u{1F1E6}\u{1F1F7}');
     this.el.voiceName = this.el.voiceSel.createSpan('piperobs-voice-name');
-    this.el.voiceName.setText('Daniela (Español AR)');
+    this.el.voiceName.setText('Daniela (español ar)');
     this.el.voiceSel.createSpan('piperobs-voice-arrow').setText('›');
     this.el.voiceSel.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -300,7 +300,7 @@ export class SidePanelView extends ItemView {
     });
 
     this.el.voiceDD = ddWrap.createDiv('piperobs-voice-dropdown');
-    document.addEventListener('click', () => {
+    activeDocument.addEventListener('click', () => {
       this.el.voiceDD?.classList.remove('visible');
       this.el.voiceSel?.classList.remove('open');
     });
@@ -316,7 +316,7 @@ export class SidePanelView extends ItemView {
     const themeLabel = themePanel.createDiv('piperobs-theme-label');
     themeLabel.createSpan().setText('Tema de resaltado');
     this.el.themePreview = themeLabel.createSpan('piperobs-theme-preview');
-    this.el.themePreview.setText('Violeta/Cyan');
+    this.el.themePreview.setText('Violeta/cyan');
     const presets = themePanel.createDiv('piperobs-color-presets');
     const themeMap: Record<KaraokeTheme, { name: string }> = {
       gold: { name: 'Oro' },
@@ -348,18 +348,18 @@ export class SidePanelView extends ItemView {
     const wpmChip = statsRow.createDiv('piperobs-stat-chip');
     this.el.statWPM = wpmChip.createDiv('piperobs-stat-value');
     this.el.statWPM.setText('--');
-    wpmChip.createDiv('piperobs-stat-label').setText('pal/min');
+    wpmChip.createDiv('piperobs-stat-label').setText('Pal/min');
     const timeChip = statsRow.createDiv('piperobs-stat-chip');
     this.el.statTime = timeChip.createDiv('piperobs-stat-value');
     this.el.statTime.setText('--');
-    timeChip.createDiv('piperobs-stat-label').setText('restante');
+    timeChip.createDiv('piperobs-stat-label').setText('Restante');
     const phraseChip = statsRow.createDiv('piperobs-stat-chip');
     this.el.statPhrase = phraseChip.createDiv('piperobs-stat-value');
     this.el.statPhrase.setText('--');
-    phraseChip.createDiv('piperobs-stat-label').setText('frases');
+    phraseChip.createDiv('piperobs-stat-label').setText('Frases');
 
     body.createDiv('piperobs-divider');
-    const voicesBtn = body.createEl('button', { cls: 'piperobs-btn-voices', text: '+ Gestionar voces' });
+    const voicesBtn = body.createEl('button', { cls: 'piperobs-btn-voices', text: '+ gestionar voces' });
     voicesBtn.addEventListener('click', () => this.onOpenVoiceModal());
 
     // Pomodoro
@@ -372,7 +372,7 @@ export class SidePanelView extends ItemView {
     const pomoText = pomoLabel.createDiv();
     pomoText.createDiv('piperobs-pomo-title').setText('Pomodoro');
     this.el.pomoSub = pomoText.createDiv('piperobs-pomo-sub');
-    this.el.pomoSub.setText('25 min lectura / 5 min descanso');
+    this.el.pomoSub.setText('25 Min lectura / 5 min descanso');
     pomoToggle.createDiv('piperobs-pomo-switch');
 
     this.el.pomoPanel = pomoWrap.createDiv('piperobs-pomo-panel');
@@ -523,7 +523,7 @@ export class SidePanelView extends ItemView {
     if (!chip) {
       const pomoWrap = this.containerEl.querySelector('.piperobs-pomo-wrap');
       if (pomoWrap) {
-        chip = pomoWrap.createEl('div', { cls: 'piperobs-pomo-adaptive-chip' });
+        chip = pomoWrap.createDiv({ cls: 'piperobs-pomo-adaptive-chip' });
       }
     }
     if (chip) {
@@ -549,7 +549,7 @@ export class SidePanelView extends ItemView {
     if (!state) {
       toggle.classList.remove('active');
       panel.classList.remove('open');
-      if (this.el.pomoSub) this.el.pomoSub.textContent = '25 min lectura / 5 min descanso';
+      if (this.el.pomoSub) this.el.pomoSub.textContent = '25 Min lectura / 5 min descanso';
       return;
     }
 

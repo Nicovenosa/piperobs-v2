@@ -49,7 +49,7 @@ export class VoiceModal extends Modal {
         const meta = info.createDiv('piperobs-voice-meta');
         meta.setText(`${voice.language} · ${voice.gender === 'femenina' ? 'femenina' : 'masculina'} · ${voice.sizeMB} MB`);
 
-        const badge = row.createEl('span');
+        const badge = row.createSpan();
         if (voice.isDefault) {
           badge.className = 'piperobs-badge def';
           badge.setText('Predeterminada');
@@ -156,7 +156,7 @@ export class VoiceModal extends Modal {
         meta.setText(`${f.language} · ${f.gender === 'femenina' ? 'femenina' : 'masculina'} · ${f.sizeMB} MB`);
 
         if (installed) {
-          row.createEl('span', { cls: 'piperobs-badge inst', text: 'Instalada' });
+          row.createSpan({ cls: 'piperobs-badge inst', text: 'Instalada' });
         } else {
           const dlBtn = row.createEl('button', { cls: 'piperobs-btn-download' });
           dlBtn.setText(`⬇ ${f.sizeMB} MB`);
@@ -225,7 +225,7 @@ export class VoiceModal extends Modal {
             info.createDiv('piperobs-voice-meta').setText(`${v.language} · ${v.quality} · ${v.sizeMB} MB`);
 
             if (installed) {
-              row.createEl('span', { cls: 'piperobs-badge inst', text: 'Instalada' });
+              row.createSpan({ cls: 'piperobs-badge inst', text: 'Instalada' });
             } else {
               const dlBtn = row.createEl('button', { cls: 'piperobs-btn-download' });
               dlBtn.setText(`⬇ ${v.sizeMB} MB`);
