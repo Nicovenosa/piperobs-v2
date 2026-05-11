@@ -210,7 +210,7 @@ export class SidePanelView extends ItemView {
     const header = root.createDiv('piperobs-sidebar-header');
     header.appendChild(makeLogoMark());
     const title = header.createDiv('piperobs-header-title');
-    title.setText('piperobs v2');
+    title.setText('PiperObs v2');
     const dot = activeDocument.createDiv();
     dot.className = 'piperobs-status-dot';
     header.appendChild(dot);
@@ -307,7 +307,7 @@ export class SidePanelView extends ItemView {
 
     // Botón reiniciar con esta voz
     this.el.restartVoiceBtn = body.createEl('button', { cls: 'piperobs-btn-restart-voice' });
-    this.el.restartVoiceBtn.setText('\u{1F504} Reiniciar con esta voz');
+    this.el.restartVoiceBtn.setText('Reiniciar con esta voz \u{1F504}');
     this.el.restartVoiceBtn.classList.add('piperobs-hidden');
     this.el.restartVoiceBtn.onclick = () => this.onRestartWithVoice();
 
@@ -316,7 +316,7 @@ export class SidePanelView extends ItemView {
     const themeLabel = themePanel.createDiv('piperobs-theme-label');
     themeLabel.createSpan().setText('Tema de resaltado');
     this.el.themePreview = themeLabel.createSpan('piperobs-theme-preview');
-    this.el.themePreview.setText('violeta/cyan');
+    this.el.themePreview.setText('Violeta/Cyan');
     const presets = themePanel.createDiv('piperobs-color-presets');
     const themeMap: Record<KaraokeTheme, { name: string }> = {
       gold: { name: 'Oro' },
@@ -339,7 +339,7 @@ export class SidePanelView extends ItemView {
 
     // Focus Mode (fuera del theme panel)
     const focusBtn = body.createEl('button', { cls: 'piperobs-btn-focus' });
-    focusBtn.setText('\u{1F3AF} Modo focus');
+    focusBtn.setText('Modo focus \u{1F3AF}');
     focusBtn.onclick = () => this.onToggleFocusMode();
     this.el.focusBtn = focusBtn;
 
@@ -348,7 +348,7 @@ export class SidePanelView extends ItemView {
     const wpmChip = statsRow.createDiv('piperobs-stat-chip');
     this.el.statWPM = wpmChip.createDiv('piperobs-stat-value');
     this.el.statWPM.setText('--');
-    wpmChip.createDiv('piperobs-stat-label').setText('pal/min');
+    wpmChip.createDiv('piperobs-stat-label').setText('Pal/min');
     const timeChip = statsRow.createDiv('piperobs-stat-chip');
     this.el.statTime = timeChip.createDiv('piperobs-stat-value');
     this.el.statTime.setText('--');
@@ -372,7 +372,7 @@ export class SidePanelView extends ItemView {
     const pomoText = pomoLabel.createDiv();
     pomoText.createDiv('piperobs-pomo-title').setText('Pomodoro');
     this.el.pomoSub = pomoText.createDiv('piperobs-pomo-sub');
-    this.el.pomoSub.setText('25 Min lectura / 5 min descanso');
+    this.el.pomoSub.setText('25 min lectura / 5 min descanso');
     pomoToggle.createDiv('piperobs-pomo-switch');
 
     this.el.pomoPanel = pomoWrap.createDiv('piperobs-pomo-panel');
@@ -549,7 +549,7 @@ export class SidePanelView extends ItemView {
     if (!state) {
       toggle.classList.remove('active');
       panel.classList.remove('open');
-      if (this.el.pomoSub) this.el.pomoSub.textContent = '25 Min lectura / 5 min descanso';
+      if (this.el.pomoSub) this.el.pomoSub.textContent = '25 min lectura / 5 min descanso';
       return;
     }
 

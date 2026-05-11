@@ -779,12 +779,12 @@ export default class PiperObsV2Plugin extends Plugin {
       if (this.pomodoro.mode === 'focus') {
         this.pomodoro.sessionsCompleted++;
         this.pauseReading();
-        new Notice('Pomodoro: ¡Tiempo de descanso! 🍅', 5000);
+        new Notice('Pomodoro: ¡tiempo de descanso! 🍅', 5000);
         this.pomodoro.mode = 'break';
         this.pomodoro.totalSec = this.adaptiveBreakMin * 60;
         this.pomodoro.remainingSec = this.pomodoro.totalSec;
       } else {
-        new Notice('Pomodoro: ¡Descanso terminado! 🎯', 5000);
+        new Notice('Pomodoro: ¡descanso terminado! 🎯', 5000);
         this.pomodoro.mode = 'focus';
         this.pomodoro.totalSec = this.adaptiveFocusMin * 60;
         this.pomodoro.remainingSec = this.pomodoro.totalSec;

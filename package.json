@@ -1,6 +1,6 @@
 {
   "name": "piperobs-v2",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "description": "Local TTS for Obsidian using Piper — Karaoke highlight, Pomodoro, 5 themes, offline voices",
   "main": "main.js",
   "scripts": {
