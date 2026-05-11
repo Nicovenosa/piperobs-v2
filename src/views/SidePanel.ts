@@ -210,7 +210,7 @@ export class SidePanelView extends ItemView {
     const header = root.createDiv('piperobs-sidebar-header');
     header.appendChild(makeLogoMark());
     const title = header.createDiv('piperobs-header-title');
-    title.setText('PiperObs v2');
+    title.setText('Piperobs v2');
     const dot = activeDocument.createDiv();
     dot.className = 'piperobs-status-dot';
     header.appendChild(dot);
@@ -316,7 +316,7 @@ export class SidePanelView extends ItemView {
     const themeLabel = themePanel.createDiv('piperobs-theme-label');
     themeLabel.createSpan().setText('Tema de resaltado');
     this.el.themePreview = themeLabel.createSpan('piperobs-theme-preview');
-    this.el.themePreview.setText('Violeta/Cyan');
+    this.el.themePreview.setText('Violeta/cyan');
     const presets = themePanel.createDiv('piperobs-color-presets');
     const themeMap: Record<KaraokeTheme, { name: string }> = {
       gold: { name: 'Oro' },
